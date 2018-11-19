@@ -107,9 +107,9 @@
     <Folder Include="Resources\drawable\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonkeyFinder\MonkeyFinder.csproj">
-      <Project>{93F5F266-8792-4E1A-9C0E-EF162E43AC44}</Project>
-      <Name>MonkeyFinder</Name>
+    <ProjectReference Include="..\MonkeyFinder\CookBook.csproj">
+      <Project>{A4767409-FD5A-408C-A0DE-9CAA76254719}</Project>
+      <Name>CookBook</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

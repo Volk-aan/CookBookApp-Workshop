@@ -4,11 +4,11 @@ using Xamarin.Forms;
 using Xamarin.Essentials;
 
 using System.Linq;
-using MonkeyFinder.Model;
+using CookBook.Model;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 
-namespace MonkeyFinder.ViewModel
+namespace CookBook.ViewModel
 {
     public class MonkeysViewModel
     {

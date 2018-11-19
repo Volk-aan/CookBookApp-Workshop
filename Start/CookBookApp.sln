@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27924.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonkeyFinder.Android", "MonkeyFinder\MonkeyFinder.Android\MonkeyFinder.Android.csproj", "{1B07E64E-8718-4E39-ADAA-B639EE3A1C03}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookBook.Android", "MonkeyFinder\MonkeyFinder.Android\CookBook.Android.csproj", "{1B07E64E-8718-4E39-ADAA-B639EE3A1C03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonkeyFinder.iOS", "MonkeyFinder\MonkeyFinder.iOS\MonkeyFinder.iOS.csproj", "{124E17C8-A2BD-4C29-B4D8-EAE61DC8F5C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookBook.iOS", "MonkeyFinder\MonkeyFinder.iOS\CookBook.iOS.csproj", "{124E17C8-A2BD-4C29-B4D8-EAE61DC8F5C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonkeyFinder.UWP", "MonkeyFinder\MonkeyFinder.UWP\MonkeyFinder.UWP.csproj", "{A78C3571-D4CF-4063-9E6B-8FA1A1A7408A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookBook.UWP", "MonkeyFinder\MonkeyFinder.UWP\CookBook.UWP.csproj", "{A78C3571-D4CF-4063-9E6B-8FA1A1A7408A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonkeyFinder", "MonkeyFinder\MonkeyFinder\MonkeyFinder.csproj", "{A4767409-FD5A-408C-A0DE-9CAA76254719}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CookBook", "MonkeyFinder\MonkeyFinder\CookBook.csproj", "{A4767409-FD5A-408C-A0DE-9CAA76254719}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3EB00B02-CDB9-4C6F-9D87-BCABD1A3675D}"
 	ProjectSection(SolutionItems) = preProject

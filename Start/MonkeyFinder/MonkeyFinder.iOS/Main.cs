@@ -5,7 +5,7 @@ using System.Linq;
 using Foundation;
 using UIKit;
 
-namespace MonkeyFinder.iOS
+namespace CookBook.iOS
 {
     public class Application
     {

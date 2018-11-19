@@ -1,11 +1,11 @@
-﻿using MonkeyFinder.Model;
+﻿using CookBook.Model;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
-namespace MonkeyFinder.ViewModel
+namespace CookBook.ViewModel
 {
     public class MonkeyDetailsViewModel : BaseViewModel
     {

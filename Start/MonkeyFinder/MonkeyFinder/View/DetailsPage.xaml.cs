@@ -1,10 +1,10 @@
-﻿using MonkeyFinder.Model;
-using MonkeyFinder.ViewModel;
+﻿using CookBook.Model;
+using CookBook.ViewModel;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-namespace MonkeyFinder.View
+namespace CookBook.View
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class DetailsPage : ContentPage

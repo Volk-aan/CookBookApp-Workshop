@@ -1,9 +1,9 @@
-﻿using MonkeyFinder.Services;
+﻿using CookBook.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Xamarin.Forms;
 
-namespace MonkeyFinder.ViewModel
+namespace CookBook.ViewModel
 {
     public class BaseViewModel 
     {

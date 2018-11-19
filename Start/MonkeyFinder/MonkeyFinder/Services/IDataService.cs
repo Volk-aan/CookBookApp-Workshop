@@ -1,8 +1,8 @@
-﻿using MonkeyFinder.Model;
+﻿using CookBook.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MonkeyFinder.Services
+namespace CookBook.Services
 {
     public interface IDataService
     {

@@ -1,7 +1,7 @@
-﻿using MonkeyFinder.Model;
+﻿using CookBook.Model;
 using Xamarin.Forms;
 
-namespace MonkeyFinder.View
+namespace CookBook.View
 {
     public partial class MainPage : ContentPage
     {

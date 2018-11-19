@@ -11,7 +11,7 @@
 
 [assembly: global::Android.Runtime.ResourceDesignerAttribute("MonkeyFinder.Droid.Resource", IsApplication=true)]
 
-namespace MonkeyFinder.Droid
+namespace CookBook.Droid
 {
 	
 	
@@ -26,7 +26,7 @@ namespace MonkeyFinder.Droid
 		
 		public static void UpdateIdValues()
 		{
-			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::MonkeyFinder.Droid.Resource.Attribute.actionBarSize;
+			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::CookBook.Droid.Resource.Attribute.actionBarSize;
 		}
 		
 		public partial class Animation

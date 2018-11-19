@@ -13,7 +13,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-namespace MonkeyFinder.UWP
+namespace CookBook.UWP
 {
     public sealed partial class MainPage
     {
@@ -21,7 +21,7 @@ namespace MonkeyFinder.UWP
         {
             this.InitializeComponent();
 
-            LoadApplication(new MonkeyFinder.App());
+            LoadApplication(new CookBook.App());
         }
     }
 }

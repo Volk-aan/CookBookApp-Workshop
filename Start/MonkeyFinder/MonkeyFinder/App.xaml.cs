@@ -1,9 +1,9 @@
-﻿using MonkeyFinder.View;
+﻿using CookBook.View;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
-namespace MonkeyFinder
+namespace CookBook
 {
     public partial class App : Application
     {
