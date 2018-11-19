@@ -10,21 +10,21 @@ using System.Collections.ObjectModel;
 
 namespace CookBook.ViewModel
 {
-    public class MonkeysViewModel : BaseViewModel
+    public class RecipesViewModel : BaseViewModel
     {
-        public ObservableCollection<Monkey> Monkeys { get; }
-        public Command GetMonkeysCommand { get; }
+        public ObservableCollection<Recipe> Recipes { get; }
+        public Command GetRecipesCommand { get; }
         public Command GetClosestCommand { get; }
-        public MonkeysViewModel()
+        public RecipesViewModel()
         {
-            Title = "Monkey Finder";
-            Monkeys = new ObservableCollection<Monkey>();
-            GetMonkeysCommand = new Command(async () => await GetMonkeysAsync());
+            Title = "Recipes";
+            Recipes = new ObservableCollection<Recipe>();
+            GetRecipesCommand = new Command(async () => await GetRecipesAsync());
             GetClosestCommand = new Command(async () => await GetClosestAsync());
         }
 
     
-        async Task GetMonkeysAsync()
+        async Task GetRecipesAsync()
         {
             if (IsBusy)
                 return;
@@ -33,15 +33,15 @@ namespace CookBook.ViewModel
             {
                 IsBusy = true;
 
-                var monkeys = await DataService.GetMonkeysAsync();
+                var recipes = await DataService.GetRecipesAsync();
 
-                Monkeys.Clear();
-                foreach (var monkey in monkeys)
-                    Monkeys.Add(monkey);
+                Recipes.Clear();
+                foreach (var recipe in recipes)
+                    Recipes.Add(recipe);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Unable to get monkeys: {ex.Message}");
+                Debug.WriteLine($"Unable to get recipes: {ex.Message}");
                 await Application.Current.MainPage.DisplayAlert("Error!", ex.Message, "OK");
             }
             finally
@@ -52,7 +52,7 @@ namespace CookBook.ViewModel
 
         async Task GetClosestAsync()
         {
-            if (IsBusy || Monkeys.Count == 0)
+            if (IsBusy || Recipes.Count == 0)
                 return;
             try
             {
@@ -66,7 +66,7 @@ namespace CookBook.ViewModel
                     });
                 }
 
-                var first = Monkeys.OrderBy(m => location.CalculateDistance(
+                var first = Recipes.OrderBy(m => location.CalculateDistance(
                     new Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
                     .FirstOrDefault();
 

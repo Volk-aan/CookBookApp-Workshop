@@ -10,7 +10,7 @@
              Title="{Binding Title}">
 
     <ContentPage.BindingContext>
-        <viewmodel:MonkeysViewModel/>
+        <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
 
     <Grid RowSpacing="0" ColumnSpacing="5" CompressedLayout.IsHeadless="True">
@@ -22,7 +22,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ListView ItemsSource="{Binding Monkeys}"
+        <ListView ItemsSource="{Binding Recipes}"
                   CachingStrategy="RecycleElement"
                   ItemSelected="ListView_ItemSelected"
                   HasUnevenRows="True"
@@ -55,7 +55,7 @@
         </ListView>
 
         <Button Text="Search" 
-                Command="{Binding GetMonkeysCommand}"
+                Command="{Binding GetRecipesCommand}"
                 IsEnabled="{Binding IsNotBusy}"
                 Grid.Row="1"
                 Grid.Column="0"/>

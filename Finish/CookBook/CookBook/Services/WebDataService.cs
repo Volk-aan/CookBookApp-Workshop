@@ -12,10 +12,10 @@ namespace CookBook.Services
     {
         HttpClient httpClient;
         HttpClient Client => httpClient ?? (httpClient = new HttpClient());
-        public async Task<IEnumerable<Monkey>> GetMonkeysAsync()
+        public async Task<IEnumerable<Recipe>> GetRecipesAsync()
         {
             var json = await Client.GetStringAsync("https://montemagno.com/monkeys.json");
-            var all = Monkey.FromJson(json);
+            var all = Recipe.FromJson(json);
             return all;
         }
     }

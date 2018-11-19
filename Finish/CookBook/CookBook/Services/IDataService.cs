@@ -6,6 +6,6 @@ namespace CookBook.Services
 {
     public interface IDataService
     {
-        Task<IEnumerable<Monkey>> GetMonkeysAsync();
+        Task<IEnumerable<Recipe>> GetRecipesAsync();
     }
 }

@@ -7,32 +7,32 @@ using Xamarin.Forms;
 
 namespace CookBook.ViewModel
 {
-    public class MonkeyDetailsViewModel : BaseViewModel
+    public class RecipeDetailsViewModel : BaseViewModel
     {
         public Command OpenMapCommand { get; }
 
-        public MonkeyDetailsViewModel()
+        public RecipeDetailsViewModel()
         {
 
             OpenMapCommand = new Command(async () => await OpenMapAsync()); 
         }
 
-        public MonkeyDetailsViewModel(Monkey monkey) 
+        public RecipeDetailsViewModel(Recipe recipe) 
             : this()
         {
-            Monkey = monkey;
-            Title = $"{Monkey.Name} Details";
+            Recipe = recipe;
+            Title = $"{Recipe.Name} Details";
         }
-        Monkey monkey;
-        public Monkey Monkey
+        Recipe recipe;
+        public Recipe Recipe
         {
-            get => monkey;
+            get => recipe;
             set
             {
-                if (monkey == value)
+                if (recipe == value)
                     return;
 
-                monkey = value;
+                recipe = value;
                 OnPropertyChanged();
             }
         }
@@ -41,7 +41,7 @@ namespace CookBook.ViewModel
         {
             try
             {
-                await Maps.OpenAsync(Monkey.Latitude, Monkey.Longitude);
+                await Maps.OpenAsync(Recipe.Latitude, Recipe.Longitude);
             }
             catch (Exception ex)
             {

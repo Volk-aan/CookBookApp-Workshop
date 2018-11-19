@@ -1,17 +1,11 @@
-﻿// To parse this JSON data, add NuGet 'Newtonsoft.Json' then do:
-//
-//    using MonkeyFinder.Model;
-//
-//    var monkeys = Monkeys.FromJson(jsonString);
-
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
 using System.Globalization;
 
 namespace CookBook.Model
 {
-    public partial class Monkey
+    public partial class Recipe
     {
         [JsonProperty("Name")]
         public string Name { get; set; }
@@ -35,14 +29,14 @@ namespace CookBook.Model
         public double Longitude { get; set; }
     }
 
-    public partial class Monkey
+    public partial class Recipe
     {
-        public static Monkey[] FromJson(string json) => JsonConvert.DeserializeObject<Monkey[]>(json, Converter.Settings);
+        public static Recipe[] FromJson(string json) => JsonConvert.DeserializeObject<Recipe[]>(json, Converter.Settings);
     }
 
     public static class Serialize
     {
-        public static string ToJson(this Monkey[] self) => JsonConvert.SerializeObject(self, Converter.Settings);
+        public static string ToJson(this Recipe[] self) => JsonConvert.SerializeObject(self, Converter.Settings);
     }
 
     internal static class Converter

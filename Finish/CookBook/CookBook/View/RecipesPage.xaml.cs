@@ -12,11 +12,11 @@ namespace CookBook.View
 
         async void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-            var monkey = e.SelectedItem as Monkey;
-            if (monkey == null)
+            var recipe = e.SelectedItem as Recipe;
+            if (recipe == null)
                 return;
 
-            await Navigation.PushAsync(new DetailsPage(monkey));
+            await Navigation.PushAsync(new DetailsPage(recipe));
 
             ((ListView)sender).SelectedItem = null;
         }

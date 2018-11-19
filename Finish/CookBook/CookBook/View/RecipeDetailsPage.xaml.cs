@@ -13,10 +13,10 @@ namespace CookBook.View
         {
             InitializeComponent();
         }
-        public DetailsPage(Monkey monkey)
+        public DetailsPage(Recipe recipe)
         {
             InitializeComponent();
-            BindingContext = new MonkeyDetailsViewModel(monkey);
+            BindingContext = new RecipeDetailsViewModel(recipe);
         }
     }
 }
