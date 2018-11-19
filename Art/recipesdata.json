@@ -1,0 +1,101 @@
+[
+  {
+    "Name": "The Big One",
+    "Location": "Africa & Asia",
+    "Details": "Baboons are African and Arabian Old World monkeys belonging to the genus Papio, part of the subfamily Cercopithecinae.",
+    "Image": "http://i.imgur.com/YMSNPvs.jpg",
+    "Population": 10000,
+    "Latitude": -8.783195,
+    "Longitude": 34.508523
+  },
+  {
+    "Name": "Mock Dog",
+    "Location": "Central & South America",
+    "Details": "The capuchin monkeys are New World monkeys of the subfamily Cebinae. Prior to 2011, the subfamily contained only a single genus, Cebus.",
+    "Image": "https://i.chzbgr.com/full/6474099968/h9EE24576/",
+    "Population": 23000,
+    "Latitude": 12.769013,
+    "Longitude": -85.602364
+  },
+  {
+    "Name": "Data cake",
+    "Location": "Central and East Africa",
+    "Details": "The blue monkey or diademed monkey is a species of Old World monkey native to Central and East Africa, ranging from the upper Congo River basin east to the East African Rift and south to northern Angola and Zambia",
+    "Image": "https://c1.staticflickr.com/3/2523/3704845236_8cf4d84013.jpg",
+    "Population": 12000,
+    "Latitude": 1.957709,
+    "Longitude": 37.297204
+  },
+  {
+    "Name": "Pie Bite",
+    "Location": "Central & South America",
+    "Details": "The squirrel monkeys are the New World monkeys of the genus Saimiri. They are the only genus in the subfamily Saimirinae. The name of the genus Saimiri is of Tupi origin, and was also used as an English name by early researchers.",
+    "Image": "https://puppetcircuits.files.wordpress.com/2010/05/img_4705.jpg",
+    "Population": 11000,
+    "Latitude": -8.783195,
+    "Longitude": -55.491477
+  },
+  {
+    "Name": "Cheese nuggets",
+    "Location": "Brazil",
+    "Details": "The golden lion tamarin also known as the golden marmoset, is a small New World monkey of the family Callitrichidae.",
+    "Image": "https://5.imimg.com/data5/BE/JR/GLADMIN-40426501/chicken-nuggets-500x500.png",
+    "Population": 19000,
+    "Latitude": -14.235004,
+    "Longitude": -51.92528
+  },
+  {
+    "Name": "Prod pizza",
+    "Location": "South America",
+    "Details": "Howler monkeys are among the largest of the New World monkeys. Fifteen species are currently recognised. Previously classified in the family Cebidae, they are now placed in the family Atelidae.",
+    "Image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXjIv3lHEpjy1GWV_GZ-Eoc9XIkXQcHLF8ChK2WkNzoMibrhwm",
+    "Population": 8000,
+    "Latitude": -8.783195,
+    "Longitude": -55.491477
+  },
+  {
+    "Name": "Jelly bugs",
+    "Location": "Japan",
+    "Details": "The Japanese macaque, is a terrestrial Old World monkey species native to Japan. They are also sometimes known as the snow monkey because they live in areas where snow covers the ground for months each",
+    "Image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/JellyBellyBeans.jpg/1200px-JellyBellyBeans.jpg",
+    "Population": 1000,
+    "Latitude": 36.204824,
+    "Longitude": 138.252924
+  },
+  {
+    "Name": "The framewok",
+    "Location": "Southern Cameroon, Gabon, Equatorial Guinea, and Congo",
+    "Details": "The mandrill is a primate of the Old World monkey family, closely related to the baboons and even more closely to the drill. It is found in southern Cameroon, Gabon, Equatorial Guinea, and Congo.",
+    "Image": "https://media-cdn.tripadvisor.com/media/photo-s/0c/d1/b5/18/le-wok-au-bewok.jpg",
+    "Population": 17000,
+    "Latitude": 7.369722,
+    "Longitude": 12.354722
+  },
+  {
+    "Name": "Spaghetti code",
+    "Location": "Borneo",
+    "Details": "The proboscis monkey or long-nosed monkey, known as the bekantan in Malay, is a reddish-brown arboreal Old World monkey that is endemic to the south-east Asian island of Borneo.",
+    "Image": "https://sourcemaking.com/files/sm/images/spagett.jpg",
+    "Population": 15000,
+    "Latitude": 0.961883,
+    "Longitude": 114.55485
+  },
+  {
+    "Name": "Infinite meat loop",
+    "Location": "Seattle",
+    "Details": "This little trouble maker lives in Seattle with James and loves traveling on adventures with James and tweeting @MotzMonkeys. He by far is an Android fanboy and is getting ready for the new Nexus 6P!",
+    "Image": "https://thespinoff.co.nz/wp-content/uploads/2018/04/mad3.jpg",
+    "Population": 1,
+    "Latitude": 47.606209,
+    "Longitude": -122.332071
+  },
+  {
+    "Name": "Asp DotNuts",
+    "Location": "Phoenix",
+    "Details": "An adorable Monkey who is traveling the world with Heather and live tweets his adventures @MotzMonkeys. His favorite platform is iOS by far and is excited for the new iPhone 6s!",
+    "Image": "https://static.cuisineaz.com/400x320/i135737-donuts-a-l-americaine.jpeg",
+    "Population": 1,
+    "Latitude": 33.448377,
+    "Longitude": -112.074037
+  }
+]
