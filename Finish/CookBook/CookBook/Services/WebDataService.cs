@@ -14,7 +14,7 @@ namespace CookBook.Services
         HttpClient Client => httpClient ?? (httpClient = new HttpClient());
         public async Task<IEnumerable<Recipe>> GetRecipesAsync()
         {
-            var json = await Client.GetStringAsync("https://montemagno.com/monkeys.json");
+            var json = await Client.GetStringAsync("http://www.croustipeze.com/ressources/recipesdata.json");
             var all = Recipe.FromJson(json);
             return all;
         }
