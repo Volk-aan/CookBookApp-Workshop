@@ -1,4 +1,4 @@
-# Xamarin  - Hands On Lab
+# Xamarin CookBook - Hands On Lab
 
 This labs is free adaptation of the amazing Monkey lab from James Montemagno !
 https://github.com/jamesmontemagno/MonkeysApp-Workshop
