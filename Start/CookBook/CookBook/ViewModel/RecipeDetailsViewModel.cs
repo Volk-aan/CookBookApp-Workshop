@@ -1,10 +1,4 @@
 ﻿using CookBook.Model;
-using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Xamarin.Forms;
-
 namespace CookBook.ViewModel
 {
     public class RecipeDetailsViewModel : BaseViewModel
@@ -14,8 +8,7 @@ namespace CookBook.ViewModel
             
         }
 
-        public RecipeDetailsViewModel(Recipe recipe) 
-            : this()
+        public RecipeDetailsViewModel(Recipe recipe)
         {
             
         }
