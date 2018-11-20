@@ -924,7 +924,7 @@ public RecipesViewModel() : base(title: "Recipes")
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
 
-<Grid 
+    <Grid 
         RowSpacing="0"
         ColumnSpacing="5" 
         CompressedLayout.IsHeadless="True">
@@ -1175,65 +1175,199 @@ At the core is a `ScrollView`, `StackLayout`, and `Grid` to layout all of the co
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:imagecircle="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
              xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
-             x:Class="CookBook.View.RecipeDetailsPage"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             ios:Page.UseSafeArea="True"
+             x:Class="CookBook.View.DetailsPage"
              Title="{Binding Title}">
+
     <ContentPage.BindingContext>
         <viewmodel:RecipeDetailsViewModel/>
     </ContentPage.BindingContext>
+
     <ScrollView>
-        <StackLayout>
+        <StackLayout Spacing="20">
             <Grid>
-                <!-- Recipe image and background -->
-            </Grid>   
-            <!-- Name, map button, and details -->
+                
+            </Grid>
         </StackLayout>
     </ScrollView>
 </ContentPage>
 ```
 
-We can now fill in our `Grid` with the following code:
+We can now fill in our `Grid` :
 
 ```xml
-<Grid.RowDefinitions>
-    <RowDefinition Height="100"/>
-    <RowDefinition Height="Auto"/>
-</Grid.RowDefinitions>
-<Grid.ColumnDefinitions>
-    <ColumnDefinition Width="*"/>
-    <ColumnDefinition Width="Auto"/>
-    <ColumnDefinition Width="*"/>
-</Grid.ColumnDefinitions>
-<BoxView BackgroundColor="{StaticResource Primary}" HorizontalOptions="FillAndExpand"
-            HeightRequest="100" Grid.ColumnSpan="3"/>
-<StackLayout Grid.RowSpan="2" Grid.Column="1" Margin="0,50,0,0">
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:imagecircle="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+             xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             ios:Page.UseSafeArea="True"
+             x:Class="CookBook.View.DetailsPage"
+             Title="{Binding Title}">
 
-    <imagecircle:CircleImage FillColor="White" 
-                            BorderColor="White"
-                            BorderThickness="2"
-                            Source="{Binding Recipe.Image}"
-                            VerticalOptions="Center"
-                                HeightRequest="100"
-                                WidthRequest="100"
-                            Aspect="AspectFill"/>
-</StackLayout>
+    <ContentPage.BindingContext>
+        <viewmodel:RecipeDetailsViewModel/>
+    </ContentPage.BindingContext>
 
-<Label FontSize="Micro" Text="{Binding Recipe.Location}" HorizontalOptions="Center" Grid.Row="1" Margin="10"/>
-<Label FontSize="Micro" Text="{Binding Recipe.Population}" HorizontalOptions="Center" Grid.Row="1" Grid.Column="2" Margin="10"/>
+    <ScrollView>
+        <StackLayout Spacing="20">
+            <Grid>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <BoxView 
+                    Grid.Row="0"
+                    Grid.ColumnSpan="3"
+                    HeightRequest="100"
+                    BackgroundColor="{StaticResource Primary}"/>
+
+                <StackLayout 
+                    Grid.Row="0" 
+                    Grid.RowSpan="2" 
+                    Grid.Column="1" 
+                    Margin="0,50,0,0">
+
+                    <imagecircle:CircleImage 
+                        Source="{Binding Recipe.Image}"
+                        Aspect="AspectFill"
+                        FillColor="White" 
+                        BorderColor="White"
+                        BorderThickness="2"
+                        HeightRequest="100"
+                        WidthRequest="100"
+                        VerticalOptions="Center"/>
+                </StackLayout>
+
+                <Label 
+                    Grid.Row="1" 
+                    Grid.Column="0" 
+                    FontSize="Micro" 
+                    Text="{Binding Recipe.Location}" 
+                    HorizontalOptions="Center"  
+                    Margin="10"/>
+
+                <Label 
+                    Grid.Row="1" 
+                    Grid.Column="2"
+                    FontSize="Micro" 
+                    Text="{Binding Recipe.Population}" 
+                    HorizontalOptions="Center"
+                    Margin="10"/>
+            </Grid>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
 ```
 
 Finally, under the `Grid`, but inside of the `StackLayout` we will add details about the recipe.
 
 ```xml
-<Label Text="{Binding Recipe.Name}" HorizontalOptions="Center" FontSize="Medium" FontAttributes="Bold"/>
-<Button Text="Open Map" 
-        Command="{Binding OpenMapCommand}"
-        HorizontalOptions="Center" 
-        WidthRequest="200" 
-        Style="{StaticResource ButtonOutline}"/>
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:imagecircle="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+             xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             ios:Page.UseSafeArea="True"
+             x:Class="CookBook.View.DetailsPage"
+             Title="{Binding Title}">
 
-<BoxView HeightRequest="1" Color="#DDDDDD"/>
+    <ContentPage.BindingContext>
+        <viewmodel:RecipeDetailsViewModel/>
+    </ContentPage.BindingContext>
 
-<Label Text="{Binding Recipe.Details}" Margin="10"/>
+    <ScrollView>
+        <StackLayout Spacing="20">
+            <Grid>
+
+                <!-- Add this -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <BoxView 
+                    Grid.Row="0"
+                    Grid.ColumnSpan="3"
+                    HeightRequest="100"
+                    BackgroundColor="{StaticResource Primary}"/>
+
+                <StackLayout 
+                    Grid.Row="0" 
+                    Grid.RowSpan="2" 
+                    Grid.Column="1" 
+                    Margin="0,50,0,0">
+
+                    <imagecircle:CircleImage 
+                        Source="{Binding Recipe.Image}"
+                        Aspect="AspectFill"
+                        FillColor="White" 
+                        BorderColor="White"
+                        BorderThickness="2"
+                        HeightRequest="100"
+                        WidthRequest="100"
+                        VerticalOptions="Center"/>
+                </StackLayout>
+
+                <Label 
+                    Grid.Row="1" 
+                    Grid.Column="0" 
+                    FontSize="Micro" 
+                    Text="{Binding Recipe.Location}" 
+                    HorizontalOptions="Center"  
+                    Margin="10"/>
+
+                <Label 
+                    Grid.Row="1" 
+                    Grid.Column="2"
+                    FontSize="Micro" 
+                    Text="{Binding Recipe.Population}" 
+                    HorizontalOptions="Center"
+                    Margin="10"/>
+            </Grid>
+
+            <!-- Add this -->
+            <Label 
+                Text="{Binding Recipe.Name}" 
+                HorizontalOptions="Center" 
+                FontSize="Medium" 
+                FontAttributes="Bold"/>
+
+            <Button 
+                Text="Open Map" 
+                Command="{Binding OpenMapCommand}"
+                WidthRequest="200" 
+                HorizontalOptions="Center" 
+                Style="{StaticResource ButtonOutline}"/>
+
+            <BoxView 
+                HeightRequest="1" 
+                Color="#DDDDDD"/>
+
+            <Label
+                Text="{Binding Recipe.Details}" 
+                Margin="10,0"/>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
 ```
 
 
