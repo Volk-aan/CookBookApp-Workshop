@@ -143,8 +143,17 @@ namespace CookBook.ViewModel
                 if(image != null)
                 {
                     var tag = await ExtractInfoFromPicture(image);
-                    await Application.Current.MainPage.DisplayAlert("Ca a l'air bon !", $"On affiche des recette de {tag.TagName} ? ({tag.Probability:P1} sûr)", "OK");
-                    await GetRecipesByCategoryAsync(tag.TagName);
+                    if (tag.Probability > 0.40)
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Yummy :D", $"Let's cook {tag.TagName} ! \n\n -- {tag.Probability:P1} accuracy --", "OK");
+                        await GetRecipesByCategoryAsync(tag.TagName);
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Hum... :/", $"I've no idea what I'm looking at", "OK");
+
+                    }
+                    
                 }
             }
             catch (Exception ex)
