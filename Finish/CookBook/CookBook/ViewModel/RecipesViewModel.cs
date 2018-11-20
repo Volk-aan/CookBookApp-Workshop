@@ -17,6 +17,8 @@ using Plugin.Media;
 using Plugin.Media.Abstractions;
 using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction.Models;
 using Newtonsoft.Json;
+using CookBook.Helpers;
+using Plugin.Permissions.Abstractions;
 
 namespace CookBook.ViewModel
 {
@@ -139,6 +141,9 @@ namespace CookBook.ViewModel
 
             try
             {
+                if (!await PermissionsManager.RequestPermissions(new[] { Permission.Camera, Permission.Storage }))
+                    return;
+
                 var image = await TakePhoto();
                 if(image != null)
                 {
