@@ -40,7 +40,7 @@ namespace CookBook.ViewModel
             OpenMapCommand = new Command(async () => await OpenMapAsync()); 
         }
 
-        public RecipeDetailsViewModel(Recipe recipe) : base(title: $"{recipe.Name} Details")
+        public RecipeDetailsViewModel(Recipe recipe) : base(title: $"{recipe.Name}")
         {
             Recipe = recipe;
             OpenMapCommand = new Command(async () => await OpenMapAsync());

@@ -3,7 +3,7 @@
 This labs is free adaptation of the amazing Monkey lab from James Montemagno !
 https://github.com/jamesmontemagno/MonkeysApp-Workshop
 
-Today we will build a [Xamarin.Forms](https://docs.microsoft.com/xamarin/) application that will display a list of Recipes from around the world. We will start by building the business logic backend that pulls down json-ecoded data from a RESTful endpoint. We will then leverage [Xamarin.Essentials](https://docs.microsoft.com/xamarin/essentials/index) to find the closest recipe to us and also show the recipe on a map. 
+Today we will build a [Xamarin.Forms](https://docs.microsoft.com/xamarin/) application that will display a list of Recipes from around the world. We will start by building the business logic backend that pulls down json-encoded data from a RESTful endpoint. We will then leverage [Xamarin.Essentials](https://docs.microsoft.com/xamarin/essentials/index) to find the closest recipe to us and also show the recipe on a map. 
 
 ## Setup Guide
 Follow our simple [setup guide](https://github.com/xamarin/dev-days-labs/raw/master/Xamarin%20Workshop%20Setup.pdf) to ensure you have Visual Studio and Xamarin setup and ready to deploy.
