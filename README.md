@@ -21,7 +21,7 @@ This CookBookApp contains 4 projects
 * CookBook.iOS - Xamarin.iOS application (requires a macOS build host)
 * CookBook.UWP - Windows 10 UWP application (requires Visual Studio /2017 on Windows 10)
 
-![Solution](Art/Solution.PNG)
+![Solution](Art/Solution.PNG=355x408)
 
 The **CookBook** project also has blank code files and XAML pages that we will use during the Hands on Lab. All of the code that we modify will be in this project for the workshop.
 
@@ -31,7 +31,7 @@ All projects have the required NuGet packages already installed, so there will b
 
 1. **Right-click** on the **Solution** and selecting **Restore NuGet packages...**
 
-![Restore NuGets](Art/RestoreNuGets.PNG)
+![Restore NuGets](Art/RestoreNuGets.PNG=710x218)
 
 ### 3. Model
 
@@ -443,7 +443,7 @@ public class RecipesViewModel : BaseViewModel
 ## 10. Build The Recipes User Interface
 It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xaml`. Our end result is to build a page that looks like this:
 
-![](Art/FinalUI.PNG)
+![](Art/FinalUI.PNG=355x667)
 
 1. In `RecipesPage.xaml`, add a `BindingContext` between the `ContentPage` tags, which will enable us to get binding intellisense:
 
