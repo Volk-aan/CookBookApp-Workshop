@@ -1,8 +1,10 @@
 ﻿using CookBook.Model;
 using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
 
 namespace CookBook.View
 {
+    [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MainPage : ContentPage
     {
         public MainPage()
@@ -10,15 +12,15 @@ namespace CookBook.View
             InitializeComponent();
         }
 
-        async void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+        private async void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-            var recipe = e.SelectedItem as Recipe;
-            if (recipe == null)
-                return;
+            if (e.SelectedItem is Recipe selectedRecipe)
+            {
+                ListView listView = (ListView) sender;
+                listView.SelectedItem = null;
 
-            await Navigation.PushAsync(new DetailsPage(recipe));
-
-            ((ListView)sender).SelectedItem = null;
+                await Navigation.PushAsync(new DetailsPage(selectedRecipe));
+            }
         }
     }
 }

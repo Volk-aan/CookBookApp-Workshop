@@ -3,7 +3,7 @@
 This labs is free adaptation of the amazing Monkey lab from James Montemagno !
 https://github.com/jamesmontemagno/MonkeysApp-Workshop
 
-Today we will build a [Xamarin.Forms](https://docs.microsoft.com/xamarin/) application that will display a list of Recipes from around the world. We will start by building the business logic backend that pulls down json-ecoded data from a RESTful endpoint. We will then leverage [Xamarin.Essentials](https://docs.microsoft.com/xamarin/essentials/index) to find the closest recipe to us and also show the recipe on a map. 
+Today we will build a [Xamarin.Forms](https://docs.microsoft.com/xamarin/) application that will display a list of Recipes from around the world. We will start by building the business logic backend that pulls down json-encoded data from a RESTful endpoint. We will then leverage [Xamarin.Essentials](https://docs.microsoft.com/xamarin/essentials/index) to find the closest recipe to us and also show the recipe on a map. 
 
 ## Setup Guide
 Follow our simple [setup guide](https://github.com/xamarin/dev-days-labs/raw/master/Xamarin%20Workshop%20Setup.pdf) to ensure you have Visual Studio and Xamarin setup and ready to deploy.
@@ -12,16 +12,16 @@ Follow our simple [setup guide](https://github.com/xamarin/dev-days-labs/raw/mas
 
 ### 1. Open Solution in Visual Studio
 
-1. Open **Start/CookBookApp.sln**
+1. Open **Start/CookBook.sln**
 
 This CookBookApp contains 4 projects
 
-* CookBook  - Shared .NET Standard project that will have all shared code (model, views, view models, and services)
+* CookBook  - Shared .NET Standard project that will have all shared code (models, views, view models)
 * CookBook.Android - Xamarin.Android application
 * CookBook.iOS - Xamarin.iOS application (requires a macOS build host)
 * CookBook.UWP - Windows 10 UWP application (requires Visual Studio /2017 on Windows 10)
 
-![Solution](Art/Solution.PNG)
+<img src="Art/Solution.PNG" width="355" height="408"/>
 
 The **CookBook** project also has blank code files and XAML pages that we will use during the Hands on Lab. All of the code that we modify will be in this project for the workshop.
 
@@ -31,7 +31,7 @@ All projects have the required NuGet packages already installed, so there will b
 
 1. **Right-click** on the **Solution** and selecting **Restore NuGet packages...**
 
-![Restore NuGets](Art/RestoreNuGets.PNG)
+<img src="Art/RestoreNuGets.PNG" width="710" height="218"/>
 
 ### 3. Model
 
@@ -67,16 +67,6 @@ public partial class Recipe
 
     [JsonProperty("Longitude")]
     public double Longitude { get; set; }
-}
-
-public partial class Recipe
-{
-    public static Recipe[] FromJson(string json) => JsonConvert.DeserializeObject<Recipe[]>(json, CookBook.Model.Converter.Settings);
-}
-
-public static class Serialize
-{
-    public static string ToJson(this Recipe[] self) => JsonConvert.SerializeObject(self, CookBook.Model.Converter.Settings);
 }
 
 internal static class Converter
@@ -130,48 +120,73 @@ public event PropertyChangedEventHandler PropertyChanged;
     - Note: We will call `OnPropertyChanged` whenever a property updates
 
 ```csharp
-private void OnPropertyChanged([CallerMemberName] string name = null)
+public void OnPropertyChanged([CallerMemberName] string propertyName = "")
 {
-
+    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
-```
-
-7. Add code to `OnPropertyChanged`:
-
-```csharp
-private void OnPropertyChanged([CallerMemberName] string name = null) =>
-    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 ```
 
 ### 5. Implementing Title, IsBusy, and IsNotBusy
 
 We will create a backing field and accessors for a few properties. These properties will allow us to set the title on our pages and also let our view know that our view model is busy so we don't perform duplicate operations (like allowing the user to refresh the data multiple times). They are in the `BaseViewModel` because they are common for every page.
 
-1. In `BaseViewModel.cs`, create the backing field:
+1. In `BaseViewModel.cs`, create the following properties:
 
 ```csharp
 public class BaseViewModel : INotifyPropertyChanged
 {
-    bool isBusy;
-    string title;
+    private string _title;
+    public string Title
+    {
+        get => _title;
+        set
+        {
+            _title = value;
+        }
+    }
+
+    private bool _isBusy;
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set
+        {
+            _isBusy = value;
+        }
+    }
     //...
 }
 ```
 
-2. Create the properties:
+2. Add a constructor with a title parameter :
 
 ```csharp
 public class BaseViewModel : INotifyPropertyChanged
 {
     //...
-     public bool IsBusy
+    public BaseViewModel(string title)
+    {
+        Title = title;
+    }
+    //...
+}
+```
+
+3. Add OnPropertyChanged to the properties:
+
+```csharp
+public class BaseViewModel : INotifyPropertyChanged
+{
+    public bool IsBusy
     {
         get => isBusy;
         set
         {
             if (isBusy == value)
                 return;
+                
             isBusy = value;
+            
             OnPropertyChanged();
         }
     }
@@ -183,7 +198,9 @@ public class BaseViewModel : INotifyPropertyChanged
         {
             if (title == value)
                 return;
+                
             title = value;
+            
             OnPropertyChanged();
         }
     }
@@ -206,9 +223,10 @@ public class BaseViewModel : INotifyPropertyChanged
         {
             if (isBusy == value)
                 return;
+                
             isBusy = value;
+            
             OnPropertyChanged();
-            // Also raise the IsNotBusy property changed
             OnPropertyChanged(nameof(IsNotBusy));
         }
     } 
@@ -218,111 +236,43 @@ public class BaseViewModel : INotifyPropertyChanged
 }
 ```
 
-### 6. Creating our Data Service
+### 6. Add a HttpClient in BaseViewModel
 
-Inside our our `Services` folder lives two files that represent an interface contract (`IDataService`) for getting the data and an implementation that we will fill in (`WebDataService`).
-
-1. Let's first create the interface in `Services/IDataService.cs`. It will be a simple method that returns a Task of a list of recipes. Place this code inside of: `public interface IDataService`
+To simplify the internet interactions, we will add these following lines inside our **BaseViewModel** :
 
 ```csharp
-Task<IEnumerable<Recipe>> GetRecipesAsync();
-```
-
-Next, inside of `Services/WebDataService.cs` will live the implementation to get these recipes. I have already brought in the namespaces required for the implementation.
-
-2. We can now implement that interface. First by adding `IDataService` to the class:
-
-Before:
-
-```csharp
-public class WebDataService 
+public class BaseViewModel : INotifyPropertyChanged
 {
+    //...
+    private HttpClient _httpClient;
+    protected HttpClient Client => _httpClient ?? (_httpClient = new HttpClient());
+    //...
 }
 ```
 
-After:
+`Client` property will be used by our view models to retrieve data from the internet.
 
-```csharp
-public class WebDataService : IDataService
-{
-}
-```
-
-3. Implement the `IDataService` Interface
-   - (Visual Studio for Mac) In the right-click menu, select Quick Fix -> Implement Interface
-   - (Visual Studio PC) In the right-click menu, select Quick Actions and Refactorings -> Implement Interface
-
-Before implementing `GetRecipesAsync` we will setup our HttpClient by setting up a shared instance inside of the class:
-
-```csharp
-HttpClient httpClient;
-HttpClient Client => httpClient ?? (httpClient = new HttpClient());
-```
-
-Now we can implement the method. We will be using async calls, so we must add the `async` attribute to the method:
-
-Before:
-
-```csharp
-public Task<IEnumerable<Recipe>> GetRecipesAsync()
-{
-}
-```
-
-After:
-
-```csharp
-public async Task<IEnumerable<Recipe>> GetRecipesAsync()
-{
-}
-```
-
-To get the data from our server and parse it is actually extremely easy by leveraging `HttpClient` and `Json.NET`:
-
-```csharp
-public async Task<IEnumerable<Recipe>> GetRecipesAsync()
-{
-    var json = await Client.GetStringAsync("https://montemagno.com/recipes.json");
-    var all = Recipe.FromJson(json);
-    return all;
-}
-```
-
-Note that in this file is a line of a code above the namespace `[assembly:Dependency(typeof(WebDataService))]`. This is the Xamarin.Forms dependency service which will automatically register this class and it's interface that we can retrieve a global instance of later.
-
-4. Let's end by ensuring we have reference at any time to this implementation by retrieving it in our `BaseViewModel` by adding the following code in the class:
-
-```csharp
-public IDataService DataService { get; }
-public BaseViewModel()
-{
-    DataService = DependencyService.Get<IDataService>();
-}
-```
-
-### 6. Create ObservableCollection of Recipes
+### 7. Create ObservableCollection of Recipes
 
 We will use an `ObservableCollection<Recipe>` that will be cleared and then loaded with **Recipe** objects. We use an `ObservableCollection` because it has built-in support to raise `CollectionChanged` events when we Add or Remove items from the collection. This means we don't call `OnPropertyChanged` when updating the collection.
 
-1. In `RecipesViewModel.cs` declare an auto-property which we will initialize to an empty collection. Also, we can set our Title to `Recipe Finder`.
+1. In `RecipesViewModel.cs` declare an auto-property which we will initialize to an empty collection. Also, we can set our view model Title to `Recipes` using base constructor.
 
 ```csharp
 public class RecipesViewModel : BaseViewModel
 {
-    //...
     public ObservableCollection<Recipe> Recipes { get; }
-    public RecipesViewModel()
+    
+    public RecipesViewModel() : base(title: "Recipes")
     {
-        Title = "Recipe Finder";
         Recipes = new ObservableCollection<Recipe>();
     }
-    //...
 }
 ```
 
-### 7. Create GetRecipesAsync Method
+### 8. Get Recipes from the internet
 
-We are ready to create a method named `GetRecipesAsync` which will retrieve the recipe data from the internet. We will first implement this with a simple HTTP request, and later update it to grab and sync the data from Azure!
+We are ready to retrieve the recipe data from the internet. We will not use DependencyService here to keep it simple.
 
 1. In `RecipesViewModel.cs`, create a method named `GetRecipesAsync` with that returns `async Task`:
 
@@ -330,8 +280,9 @@ We are ready to create a method named `GetRecipesAsync` which will retrieve the 
 public class RecipesViewModel : BaseViewModel
 {
     //...
-    async Task GetRecipesAsync()
+    private async Task GetRecipesAsync()
     {
+    
     }
     //...
 }
@@ -340,7 +291,7 @@ public class RecipesViewModel : BaseViewModel
 2. In `GetRecipesAsync`, first ensure `IsBusy` is false. If it is true, `return`
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     if (IsBusy)
         return;
@@ -351,14 +302,16 @@ async Task GetRecipesAsync()
     - Notice, that we toggle *IsBusy* to true and then false when we start to call to the server and when we finish.
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     if (IsBusy)
         return;
 
+    IsBusy = true;
+    
     try
     {
-        IsBusy = true;
+        
 
     }
     catch (Exception ex)
@@ -369,37 +322,35 @@ async Task GetRecipesAsync()
     {
        IsBusy = false;
     }
-
 }
 ```
 
-4. In the `try` block of `GetRecipesAsync`, we can get the recipes from our Data Service.
+4. In the `try` block of `GetRecipesAsync`, we will get the recipes using the HttpClient (Client) in our BaseViewModel class.
+To get the data from our server and parse it is actually extremely easy by leveraging `HttpClient` and `Json.NET`.
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     ...
     try
     {
-        IsBusy = true;
-
-        var recipes = await DataService.GetRecipesAsync();
+        string jsonRecipes = await Client.GetStringAsync("http://www.croustipeze.com/ressources/recipesdata.json");
+        Recipe[] recipes = JsonConvert.DeserializeObject<Recipe[]>(jsonRecipes, Converter.Settings);
     }
     ... 
 }
 ```
 
-6. Inside of the `using`, clear the `Recipes` property and then add the new recipe data:
+5. Inside of the `try`, clear the `Recipes` property and then add the new recipe data:
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     //...
     try
     {
-        IsBusy = true;
-
-        var recipes = await DataService.GetRecipesAsync();
+        string jsonRecipes = await Client.GetStringAsync("http://www.croustipeze.com/ressources/recipesdata.json");
+        Recipe[] recipes = JsonConvert.DeserializeObject<Recipe[]>(jsonRecipes, Converter.Settings);
 
         Recipes.Clear();
         foreach (var recipe in recipes)
@@ -409,10 +360,10 @@ async Task GetRecipesAsync()
 }
 ```
 
-7. In `GetRecipesAsync`, add this code to the `catch` block to display a popup if the data retrieval fails:
+6. In `GetRecipesAsync`, add this code to the `catch` block to display a popup if the data retrieval fails:
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     //...
     catch(Exception ex)
@@ -424,19 +375,20 @@ async Task GetRecipesAsync()
 }
 ```
 
-8. Ensure the completed code looks like this:
+7. Ensure the completed code looks like this:
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     if (IsBusy)
         return;
 
+    IsBusy = true;
+
     try
     {
-        IsBusy = true;
-
-        var recipes = await DataService.GetRecipesAsync();
+        string jsonRecipes = await Client.GetStringAsync("http://www.croustipeze.com/ressources/recipesdata.json");
+        Recipe[] recipes = JsonConvert.DeserializeObject<Recipe[]>(jsonRecipes, Converter.Settings);
 
         Recipes.Clear();
         foreach (var recipe in recipes)
@@ -445,7 +397,7 @@ async Task GetRecipesAsync()
     catch (Exception ex)
     {
         Debug.WriteLine($"Unable to get recipes: {ex.Message}");
-        await Application.Current.RecipesPage.DisplayAlert("Error!", ex.Message, "OK");
+        await Application.Current.MainPage.DisplayAlert("Error!", ex.Message, "OK");
     }
     finally
     {
@@ -456,7 +408,7 @@ async Task GetRecipesAsync()
 
 Our main method for getting data is now complete!
 
-#### 8. Create GetRecipes Command
+#### 9. Create GetRecipes Command
 
 Instead of invoking this method directly, we will expose it with a `Command`. A `Command` has an interface that knows what method to invoke and has an optional way of describing if the Command is enabled.
 
@@ -488,10 +440,10 @@ public class RecipesViewModel : BaseViewModel
 }
 ```
 
-## 9. Build The Recipes User Interface
+## 10. Build The Recipes User Interface
 It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xaml`. Our end result is to build a page that looks like this:
 
-![](Art/FinalUI.PNG)
+<img src="Art/FinalUI.PNG" width="355" height="667"/>
 
 1. In `RecipesPage.xaml`, add a `BindingContext` between the `ContentPage` tags, which will enable us to get binding intellisense:
 
@@ -499,12 +451,11 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:CookBook"
              xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
              xmlns:circle="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
              x:Class="CookBook.View.RecipesPage">
 
-    <!-- Add this -->
     <ContentPage.BindingContext>
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
@@ -548,15 +499,21 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
     </ContentPage.BindingContext>
 
     <!-- Add this -->
-    <Grid RowSpacing="0" ColumnSpacing="5">
+    <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        
     </Grid>
 </ContentPage>
 ```
@@ -577,21 +534,30 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
 
-    <!-- Add this -->
-    <Grid RowSpacing="0" ColumnSpacing="5">
+    <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-         <ListView ItemsSource="{Binding Recipes}"
-                  CachingStrategy="RecycleElement"
-                  HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
 
+        <!-- Add this -->
+        <ListView 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding Recipes}"
+            HasUnevenRows="True"
+            CachingStrategy="RecycleElement">
+            
         </ListView>
     </Grid>
 </ContentPage>
@@ -613,35 +579,54 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
 
-    <Grid RowSpacing="0" ColumnSpacing="5">
+    <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-         <ListView ItemsSource="{Binding Recipes}"
-                  CachingStrategy="RecycleElement"
-                  HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
+
+        <ListView 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding Recipes}"
+            HasUnevenRows="True"
+            CachingStrategy="RecycleElement">
+
             <!-- Add this -->
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Grid ColumnSpacing="10" Padding="10">
+                        <Grid 
+                            ColumnSpacing="10" 
+                            Padding="10">
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding Image}"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    WidthRequest="60"
-                                    HeightRequest="60"
-                                    Aspect="AspectFill"/>
-                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+
+                            <Image 
+                                Source="{Binding Image}"
+                                Aspect="AspectFill"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+                            
+                            <StackLayout 
+                                Grid.Column="1"
+                                VerticalOptions="Center">
+
                                 <Label Text="{Binding Name}"/>
                                 <Label Text="{Binding Location}"/>
                             </StackLayout>
@@ -654,7 +639,7 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
 </ContentPage>
 ```
 
-5. In the `RecipesPage.xaml`, we can add a `Button` under our `ListView` that will enable us to click it and get the recipes from the server:
+5. In the `RecipesPage.xaml`, we can add a `Button` under our `ListView` that will enable us to click it  and get the recipes from the server :
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -669,36 +654,54 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
     <ContentPage.BindingContext>
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
+    
+    <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
 
-
-    <Grid RowSpacing="0" ColumnSpacing="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-         <ListView ItemsSource="{Binding Recipes}"
-                  CachingStrategy="RecycleElement"
-                  HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
+
+        <ListView 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding Recipes}"
+            HasUnevenRows="True"
+            CachingStrategy="RecycleElement">
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Grid ColumnSpacing="10" Padding="10">
+                        <Grid 
+                            ColumnSpacing="10" 
+                            Padding="10">
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding Image}"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    WidthRequest="60"
-                                    HeightRequest="60"
-                                    Aspect="AspectFill"/>
-                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+
+                            <Image 
+                                Source="{Binding Image}"
+                                Aspect="AspectFill"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+                            
+                            <StackLayout 
+                                Grid.Column="1"
+                                VerticalOptions="Center">
+
                                 <Label Text="{Binding Name}"/>
                                 <Label Text="{Binding Location}"/>
                             </StackLayout>
@@ -707,16 +710,17 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
         <!-- Add this -->
-        <Button Text="Search"
-                Command="{Binding GetRecipesCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                Grid.Row="1"
-                Grid.Column="0"/>
+        <Button 
+            Grid.Row="1"
+            Grid.Column="0"
+            Text="Search" 
+            Command="{Binding GetRecipesCommand}"
+            IsEnabled="{Binding IsNotBusy}"/>
     </Grid>
 </ContentPage>
 ```
-
 
 6. Finally, In the `RecipesPage.xaml`, we can add a `ActivityIndicator` above all of our controls at the very bottom or `Grid` that will show an indication that something is happening when we press the Search button.
 
@@ -734,34 +738,53 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
 
-    <Grid RowSpacing="0" ColumnSpacing="5">
+   <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-         <ListView ItemsSource="{Binding Recipes}"
-                  CachingStrategy="RecycleElement"
-                  HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
+
+        <ListView 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding Recipes}"
+            HasUnevenRows="True"
+            CachingStrategy="RecycleElement">
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Grid ColumnSpacing="10" Padding="10">
+                        <Grid 
+                            ColumnSpacing="10" 
+                            Padding="10">
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding Image}"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    WidthRequest="60"
-                                    HeightRequest="60"
-                                    Aspect="AspectFill"/>
-                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+
+                            <Image 
+                                Source="{Binding Image}"
+                                Aspect="AspectFill"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+                            
+                            <StackLayout 
+                                Grid.Column="1"
+                                VerticalOptions="Center">
+
                                 <Label Text="{Binding Name}"/>
                                 <Label Text="{Binding Location}"/>
                             </StackLayout>
@@ -771,26 +794,35 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
             </ListView.ItemTemplate>
         </ListView>
 
-        <Button Text="Search"
-                Command="{Binding GetRecipesCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                Grid.Row="1"
-                Grid.Column="0"/>
+        <Button 
+            Grid.Row="1"
+            Grid.Column="0"
+            Text="Search" 
+            Command="{Binding GetRecipesCommand}"
+            IsEnabled="{Binding IsNotBusy}"/>
+        
+        <Button 
+            Grid.Row="1"
+            Grid.Column="1"
+            Text="Find Closest" 
+            Command="{Binding GetClosestCommand}"
+            IsEnabled="{Binding IsNotBusy}"/>
 
-
-        <!-- Add this -->
-        <ActivityIndicator IsVisible="{Binding IsBusy}"
-                           IsRunning="{Binding IsBusy}"
-                           HorizontalOptions="FillAndExpand"
-                           VerticalOptions="CenterAndExpand"
-                           Grid.RowSpan="2"
-                           Grid.ColumnSpan="2"/>
+         <!-- Add this -->
+        <ActivityIndicator 
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            IsVisible="{Binding IsBusy}"
+            IsRunning="{Binding IsBusy}"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="CenterAndExpand"/>
     </Grid>
 </ContentPage>
 ```
 
-
-### 10. Run the App
+### 11. Run the App
 
 1. In Visual Studio, set the iOS, Android, or UWP project as the startup project 
 
@@ -820,7 +852,7 @@ We can add more functionality to this page using the GPS of the device since eac
 1. In our `RecipesViewModel.cs`, let's create another method called `GetClosestAsync`:
 
 ```csharp
-async Task GetClosestAsync()
+private async Task GetClosestAsync()
 {
 
 }
@@ -836,7 +868,6 @@ async Task GetClosestAsync()
 
     try
     {
-        // Get cached location, else get real location.
         var location = await Geolocation.GetLastKnownLocationAsync();
         if (location == null)
         {
@@ -847,37 +878,37 @@ async Task GetClosestAsync()
             });
         }
 
-        // Find closest recipe to us
-        var first = Recipes.OrderBy(m => location.CalculateDistance(
-            new Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
+        var closestRecipe = Recipes
+            .OrderBy(m => location.CalculateDistance(new Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
             .FirstOrDefault();
 
-        await Application.Current.RecipesPage.DisplayAlert("", first.Name + " " +
-            first.Location, "OK");
-
+        if(closestRecipe == null)
+            await Application.Current.MainPage.DisplayAlert("No recipe found", "Something went wrong !", "OK");
+        else
+            await Application.Current.MainPage.DisplayAlert("Closest recipe", closestRecipe.Name + " at " + closestRecipe.Location, "OK");
     }
     catch (Exception ex)
     {
         Debug.WriteLine($"Unable to query location: {ex.Message}");
-        await Application.Current.RecipesPage.DisplayAlert("Error!", ex.Message, "OK");
+        await Application.Current.MainPage.DisplayAlert("Error!", ex.Message, "OK");
     }
 }
 ```
 
-2. We can now create a new `Command` that we can bind to:
+2. We can now add a new `Command` that we can bind to:
 
 ```csharp
-// ..
+//...
 public Command GetClosestCommand { get; }
-public RecipesViewModel()
+
+public RecipesViewModel() : base(title: "Recipes")
 {
-    // ..
+    //...
     GetClosestCommand = new Command(async () => await GetClosestAsync());
 }
 ```
 
 3. Back in our `RecipesPage.xaml` we can add another `Button` that will call this new method:
-
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -893,35 +924,53 @@ public RecipesViewModel()
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
 
+    <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
 
-    <Grid RowSpacing="0" ColumnSpacing="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-         <ListView ItemsSource="{Binding Recipes}"
-                  CachingStrategy="RecycleElement"
-                  HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
+
+        <ListView 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding Recipes}"
+            HasUnevenRows="True"
+            CachingStrategy="RecycleElement">
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Grid ColumnSpacing="10" Padding="10">
+                        <Grid 
+                            ColumnSpacing="10" 
+                            Padding="10">
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding Image}"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    WidthRequest="60"
-                                    HeightRequest="60"
-                                    Aspect="AspectFill"/>
-                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+
+                            <Image 
+                                Source="{Binding Image}"
+                                Aspect="AspectFill"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+                            
+                            <StackLayout 
+                                Grid.Column="1"
+                                VerticalOptions="Center">
+
                                 <Label Text="{Binding Name}"/>
                                 <Label Text="{Binding Location}"/>
                             </StackLayout>
@@ -930,25 +979,31 @@ public RecipesViewModel()
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button Text="Search"
-                Command="{Binding GetRecipesCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                Grid.Row="1"
-                Grid.Column="0"/>
 
+        <Button 
+            Grid.Row="1"
+            Grid.Column="0"
+            Text="Search" 
+            Command="{Binding GetRecipesCommand}"
+            IsEnabled="{Binding IsNotBusy}"/>
+        
         <!-- Add this -->
-        <Button Text="Find Closest" 
-                Command="{Binding GetClosestCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                Grid.Row="1"
-                Grid.Column="1"/>
+        <Button 
+            Grid.Row="1"
+            Grid.Column="1"
+            Text="Find Closest" 
+            Command="{Binding GetClosestCommand}"
+            IsEnabled="{Binding IsNotBusy}"/>
 
-        <ActivityIndicator IsVisible="{Binding IsBusy}"
-                           IsRunning="{Binding IsBusy}"
-                           HorizontalOptions="FillAndExpand"
-                           VerticalOptions="CenterAndExpand"
-                           Grid.RowSpan="2"
-                           Grid.ColumnSpan="2"/>
+        <ActivityIndicator 
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            IsVisible="{Binding IsBusy}"
+            IsRunning="{Binding IsBusy}"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="CenterAndExpand"/>
     </Grid>
 </ContentPage>
 ```
@@ -962,25 +1017,27 @@ Xamarin.Forms gives developers a great base set of controls to use for applicati
 In our `RecipesPage.xaml` replace:
 
 ```xml
-<Image Source="{Binding Image}"
-        HorizontalOptions="Center"
-        VerticalOptions="Center"
+    <Image 
+        Source="{Binding Image}"
+        Aspect="AspectFill"
         WidthRequest="60"
         HeightRequest="60"
-        Aspect="AspectFill"/>
+        HorizontalOptions="Center"
+        VerticalOptions="Center"/>
 ```
 
 with our new `CircleImage`:
 
 ```xml
-<circle:CircleImage Source="{Binding Image}"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    BorderColor="{StaticResource PrimaryDark}"
-                    BorderThickness="3"
-                    WidthRequest="60"
-                    HeightRequest="60"
-                    Aspect="AspectFill"/>
+    <circle:CircleImage 
+        Source="{Binding Image}"
+        Aspect="AspectFill"
+        BorderColor="{StaticResource PrimaryDark}"
+        BorderThickness="3"
+        WidthRequest="60"
+        HeightRequest="60"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"/>
 ```
 
 Note: that the `PrimaryDark` color is defined in our App.xaml as a global resource.
@@ -996,19 +1053,25 @@ Now, let's add navigation to a second page that displays recipe details!
 Before:
 
 ```xml
-<ListView ItemsSource="{Binding Recipes}"
-            CachingStrategy="RecycleElement"
-            HasUnevenRows="True"
-            Grid.ColumnSpan="2">
+    <ListView 
+        Grid.Row="0"
+        Grid.Column="0"
+        Grid.ColumnSpan="2"
+        ItemsSource="{Binding Recipes}"
+        HasUnevenRows="True"
+        CachingStrategy="RecycleElement">
 ```
 
 After:
 ```xml
-<ListView ItemsSource="{Binding Recipes}"
-            CachingStrategy="RecycleElement"
-            ItemSelected="ListView_ItemSelected"
-            HasUnevenRows="True"
-            Grid.ColumnSpan="2">
+    <ListView 
+        Grid.Row="0"
+        Grid.Column="0"
+        Grid.ColumnSpan="2"
+        ItemsSource="{Binding Recipes}"
+        HasUnevenRows="True"
+        CachingStrategy="RecycleElement"
+        ItemSelected="ListView_ItemSelected">
 ```
 
 
@@ -1016,15 +1079,15 @@ After:
     - This code checks to see if the selected item is non-null and then use the built in `Navigation` API to push a new page and deselect the item.
 
 ```csharp
-async void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+private async void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
 {
-    var recipe = e.SelectedItem as Recipe;
-    if (recipe == null)
-        return;
+    if (e.SelectedItem is Recipe selectedRecipe)
+    {
+        ListView listView = (ListView) sender;
+        listView.SelectedItem = null;
 
-    await Navigation.PushAsync(new RecipeDetailsPage(recipe));
-
-    ((ListView)sender).SelectedItem = null;
+        await Navigation.PushAsync(new DetailsPage(selectedRecipe));
+    }
 }
 ```
 
@@ -1037,17 +1100,7 @@ Let's first create a bindable property for the `Recipe`:
 ```csharp
 public class RecipeDetailsViewModel : BaseViewModel
 {
-    public RecipeDetailsViewModel()
-    {
-    }
-
-    public RecipeDetailsViewModel(Recipe recipe)
-        : this()
-    {
-        Recipe = recipe;
-        Title = $"{Recipe.Name} Details";
-    }
-    Recipe recipe;
+    private Recipe recipe;
     public Recipe Recipe
     {
         get => recipe;
@@ -1060,6 +1113,16 @@ public class RecipeDetailsViewModel : BaseViewModel
             OnPropertyChanged();
         }
     }
+    
+    public RecipeDetailsViewModel() : base(title: "Details")
+    {
+
+    }
+
+    public RecipeDetailsViewModel(Recipe recipe) : base(title: $"{recipe.Name}")
+    {
+        Recipe = recipe;
+    }
 }
 ```
 
@@ -1068,16 +1131,22 @@ public class RecipeDetailsViewModel : BaseViewModel
 ```csharp
 public class RecipeDetailsViewModel : BaseViewModel
 {
+    //...
     public Command OpenMapCommand { get; }
     
-    public RecipeDetailsViewModel()
+    public RecipeDetailsViewModel() : base(title: "Details")
     {
         OpenMapCommand = new Command(async () => await OpenMapAsync()); 
     }
 
-    //..
+    public RecipeDetailsViewModel(Recipe recipe) : base(title: $"{recipe.Name}")
+    {
+        Recipe = recipe;
+        OpenMapCommand = new Command(async () => await OpenMapAsync());
+    }
+    //...
 
-    async Task OpenMapAsync()
+    private async Task OpenMapAsync()
     {
         try
         {
@@ -1086,7 +1155,7 @@ public class RecipeDetailsViewModel : BaseViewModel
         catch (Exception ex)
         {
             Debug.WriteLine($"Unable to launch maps: {ex.Message}");
-            await Application.Current.RecipesPage.DisplayAlert("Error, no Maps app!", ex.Message, "OK");
+            await Application.Current.MainPage.DisplayAlert("Error, no Maps app!", ex.Message, "OK");
         }
     }
 }
@@ -1106,65 +1175,199 @@ At the core is a `ScrollView`, `StackLayout`, and `Grid` to layout all of the co
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:imagecircle="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
              xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
-             x:Class="CookBook.View.RecipeDetailsPage"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             ios:Page.UseSafeArea="True"
+             x:Class="CookBook.View.DetailsPage"
              Title="{Binding Title}">
+
     <ContentPage.BindingContext>
         <viewmodel:RecipeDetailsViewModel/>
     </ContentPage.BindingContext>
+
     <ScrollView>
-        <StackLayout>
+        <StackLayout Spacing="20">
             <Grid>
-                <!-- Recipe image and background -->
-            </Grid>   
-            <!-- Name, map button, and details -->
+                
+            </Grid>
         </StackLayout>
     </ScrollView>
 </ContentPage>
 ```
 
-We can now fill in our `Grid` with the following code:
+We can now fill in our `Grid` :
 
 ```xml
-<Grid.RowDefinitions>
-    <RowDefinition Height="100"/>
-    <RowDefinition Height="Auto"/>
-</Grid.RowDefinitions>
-<Grid.ColumnDefinitions>
-    <ColumnDefinition Width="*"/>
-    <ColumnDefinition Width="Auto"/>
-    <ColumnDefinition Width="*"/>
-</Grid.ColumnDefinitions>
-<BoxView BackgroundColor="{StaticResource Primary}" HorizontalOptions="FillAndExpand"
-            HeightRequest="100" Grid.ColumnSpan="3"/>
-<StackLayout Grid.RowSpan="2" Grid.Column="1" Margin="0,50,0,0">
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:imagecircle="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+             xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             ios:Page.UseSafeArea="True"
+             x:Class="CookBook.View.DetailsPage"
+             Title="{Binding Title}">
 
-    <imagecircle:CircleImage FillColor="White" 
-                            BorderColor="White"
-                            BorderThickness="2"
-                            Source="{Binding Recipe.Image}"
-                            VerticalOptions="Center"
-                                HeightRequest="100"
-                                WidthRequest="100"
-                            Aspect="AspectFill"/>
-</StackLayout>
+    <ContentPage.BindingContext>
+        <viewmodel:RecipeDetailsViewModel/>
+    </ContentPage.BindingContext>
 
-<Label FontSize="Micro" Text="{Binding Recipe.Location}" HorizontalOptions="Center" Grid.Row="1" Margin="10"/>
-<Label FontSize="Micro" Text="{Binding Recipe.Population}" HorizontalOptions="Center" Grid.Row="1" Grid.Column="2" Margin="10"/>
+    <ScrollView>
+        <StackLayout Spacing="20">
+            <Grid>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <BoxView 
+                    Grid.Row="0"
+                    Grid.ColumnSpan="3"
+                    HeightRequest="100"
+                    BackgroundColor="{StaticResource Primary}"/>
+
+                <StackLayout 
+                    Grid.Row="0" 
+                    Grid.RowSpan="2" 
+                    Grid.Column="1" 
+                    Margin="0,50,0,0">
+
+                    <imagecircle:CircleImage 
+                        Source="{Binding Recipe.Image}"
+                        Aspect="AspectFill"
+                        FillColor="White" 
+                        BorderColor="White"
+                        BorderThickness="2"
+                        HeightRequest="100"
+                        WidthRequest="100"
+                        VerticalOptions="Center"/>
+                </StackLayout>
+
+                <Label 
+                    Grid.Row="1" 
+                    Grid.Column="0" 
+                    FontSize="Micro" 
+                    Text="{Binding Recipe.Location}" 
+                    HorizontalOptions="Center"  
+                    Margin="10"/>
+
+                <Label 
+                    Grid.Row="1" 
+                    Grid.Column="2"
+                    FontSize="Micro" 
+                    Text="{Binding Recipe.Population}" 
+                    HorizontalOptions="Center"
+                    Margin="10"/>
+            </Grid>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
 ```
 
 Finally, under the `Grid`, but inside of the `StackLayout` we will add details about the recipe.
 
 ```xml
-<Label Text="{Binding Recipe.Name}" HorizontalOptions="Center" FontSize="Medium" FontAttributes="Bold"/>
-<Button Text="Open Map" 
-        Command="{Binding OpenMapCommand}"
-        HorizontalOptions="Center" 
-        WidthRequest="200" 
-        Style="{StaticResource ButtonOutline}"/>
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:imagecircle="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+             xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             ios:Page.UseSafeArea="True"
+             x:Class="CookBook.View.DetailsPage"
+             Title="{Binding Title}">
 
-<BoxView HeightRequest="1" Color="#DDDDDD"/>
+    <ContentPage.BindingContext>
+        <viewmodel:RecipeDetailsViewModel/>
+    </ContentPage.BindingContext>
 
-<Label Text="{Binding Recipe.Details}" Margin="10"/>
+    <ScrollView>
+        <StackLayout Spacing="20">
+            <Grid>
+
+                <!-- Add this -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <BoxView 
+                    Grid.Row="0"
+                    Grid.ColumnSpan="3"
+                    HeightRequest="100"
+                    BackgroundColor="{StaticResource Primary}"/>
+
+                <StackLayout 
+                    Grid.Row="0" 
+                    Grid.RowSpan="2" 
+                    Grid.Column="1" 
+                    Margin="0,50,0,0">
+
+                    <imagecircle:CircleImage 
+                        Source="{Binding Recipe.Image}"
+                        Aspect="AspectFill"
+                        FillColor="White" 
+                        BorderColor="White"
+                        BorderThickness="2"
+                        HeightRequest="100"
+                        WidthRequest="100"
+                        VerticalOptions="Center"/>
+                </StackLayout>
+
+                <Label 
+                    Grid.Row="1" 
+                    Grid.Column="0" 
+                    FontSize="Micro" 
+                    Text="{Binding Recipe.Location}" 
+                    HorizontalOptions="Center"  
+                    Margin="10"/>
+
+                <Label 
+                    Grid.Row="1" 
+                    Grid.Column="2"
+                    FontSize="Micro" 
+                    Text="{Binding Recipe.Population}" 
+                    HorizontalOptions="Center"
+                    Margin="10"/>
+            </Grid>
+
+            <!-- Add this -->
+            <Label 
+                Text="{Binding Recipe.Name}" 
+                HorizontalOptions="Center" 
+                FontSize="Medium" 
+                FontAttributes="Bold"/>
+
+            <Button 
+                Text="Open Map" 
+                Command="{Binding OpenMapCommand}"
+                WidthRequest="200" 
+                HorizontalOptions="Center" 
+                Style="{StaticResource ButtonOutline}"/>
+
+            <BoxView 
+                HeightRequest="1" 
+                Color="#DDDDDD"/>
+
+            <Label
+                Text="{Binding Recipe.Details}" 
+                Margin="10,0"/>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
 ```
 
 

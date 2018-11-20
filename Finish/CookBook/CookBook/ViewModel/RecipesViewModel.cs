@@ -16,35 +16,51 @@ using System.IO;
 using Plugin.Media;
 using Plugin.Media.Abstractions;
 using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction.Models;
+using Newtonsoft.Json;
 
 namespace CookBook.ViewModel
 {
     public class RecipesViewModel : BaseViewModel
     {
+        #region Properties
+
         public ObservableCollection<Recipe> Recipes { get; }
+
+        #endregion
+
+        #region Commands
+
         public Command GetRecipesCommand { get; }
         public Command GetClosestCommand { get; }
-        public Command GetByPictureCommand { get; }
-        public RecipesViewModel()
+
+        #endregion
+       
+        #region Constructors
+        
+        public RecipesViewModel() : base(title: "Recipes")
         {
-            Title = "Recipes";
             Recipes = new ObservableCollection<Recipe>();
+
             GetRecipesCommand = new Command(async () => await GetRecipesAsync());
             GetClosestCommand = new Command(async () => await GetClosestAsync());
             GetByPictureCommand = new Command(async () => await GetRecipeByImage());
         }
 
+        #endregion
 
-        async Task GetRecipesAsync()
+        #region Methods
+
+        private async Task GetRecipesAsync()
         {
             if (IsBusy)
                 return;
 
+            IsBusy = true;
+
             try
             {
-                IsBusy = true;
-
-                var recipes = await DataService.GetRecipesAsync();
+                string jsonRecipes = await Client.GetStringAsync("http://www.croustipeze.com/ressources/recipesdata.json");
+                Recipe[] recipes = JsonConvert.DeserializeObject<Recipe[]>(jsonRecipes, Converter.Settings);
 
                 Recipes.Clear();
                 foreach (var recipe in recipes)
@@ -61,10 +77,11 @@ namespace CookBook.ViewModel
             }
         }
 
-        async Task GetClosestAsync()
+        private async Task GetClosestAsync()
         {
-            if (IsBusy || Recipes.Count == 0)
+            if (IsBusy || Recipes == null || !Recipes.Any())
                 return;
+
             try
             {
                 var location = await Geolocation.GetLastKnownLocationAsync();
@@ -77,13 +94,14 @@ namespace CookBook.ViewModel
                     });
                 }
 
-                var first = Recipes.OrderBy(m => location.CalculateDistance(
-                    new Xamarin.Essentials.Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
+                var closestRecipe = Recipes
+                    .OrderBy(m => location.CalculateDistance(new Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
                     .FirstOrDefault();
 
-                await Application.Current.MainPage.DisplayAlert("", first.Name + " " +
-                    first.Location, "OK");
-
+                if(closestRecipe == null)
+                    await Application.Current.MainPage.DisplayAlert("No recipe found", "Something went wrong !", "OK");
+                else
+                    await Application.Current.MainPage.DisplayAlert("Closest recipe", closestRecipe.Name + " at " + closestRecipe.Location, "OK");
             }
             catch (Exception ex)
             {
