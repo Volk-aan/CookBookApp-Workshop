@@ -451,12 +451,11 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:CookBook"
              xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
              xmlns:circle="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
              x:Class="CookBook.View.RecipesPage">
 
-    <!-- Add this -->
     <ContentPage.BindingContext>
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
@@ -500,15 +499,21 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
     </ContentPage.BindingContext>
 
     <!-- Add this -->
-    <Grid RowSpacing="0" ColumnSpacing="5">
+    <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        
     </Grid>
 </ContentPage>
 ```
@@ -529,21 +534,30 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
 
-    <!-- Add this -->
-    <Grid RowSpacing="0" ColumnSpacing="5">
+    <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-         <ListView ItemsSource="{Binding Recipes}"
-                  CachingStrategy="RecycleElement"
-                  HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
 
+        <!-- Add this -->
+        <ListView 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding Recipes}"
+            HasUnevenRows="True"
+            CachingStrategy="RecycleElement">
+            
         </ListView>
     </Grid>
 </ContentPage>
@@ -565,35 +579,54 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
 
-    <Grid RowSpacing="0" ColumnSpacing="5">
+    <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-         <ListView ItemsSource="{Binding Recipes}"
-                  CachingStrategy="RecycleElement"
-                  HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
+
+        <ListView 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding Recipes}"
+            HasUnevenRows="True"
+            CachingStrategy="RecycleElement">
+
             <!-- Add this -->
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Grid ColumnSpacing="10" Padding="10">
+                        <Grid 
+                            ColumnSpacing="10" 
+                            Padding="10">
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding Image}"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    WidthRequest="60"
-                                    HeightRequest="60"
-                                    Aspect="AspectFill"/>
-                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+
+                            <Image 
+                                Source="{Binding Image}"
+                                Aspect="AspectFill"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+                            
+                            <StackLayout 
+                                Grid.Column="1"
+                                VerticalOptions="Center">
+
                                 <Label Text="{Binding Name}"/>
                                 <Label Text="{Binding Location}"/>
                             </StackLayout>
@@ -606,7 +639,7 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
 </ContentPage>
 ```
 
-5. In the `RecipesPage.xaml`, we can add a `Button` under our `ListView` that will enable us to click it and get the recipes from the server:
+5. In the `RecipesPage.xaml`, we can add a `Button` under our `ListView` that will enable us to click it  and get the recipes from the server :
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -621,36 +654,54 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
     <ContentPage.BindingContext>
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
+    
+    <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
 
-
-    <Grid RowSpacing="0" ColumnSpacing="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-         <ListView ItemsSource="{Binding Recipes}"
-                  CachingStrategy="RecycleElement"
-                  HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
+
+        <ListView 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding Recipes}"
+            HasUnevenRows="True"
+            CachingStrategy="RecycleElement">
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Grid ColumnSpacing="10" Padding="10">
+                        <Grid 
+                            ColumnSpacing="10" 
+                            Padding="10">
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding Image}"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    WidthRequest="60"
-                                    HeightRequest="60"
-                                    Aspect="AspectFill"/>
-                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+
+                            <Image 
+                                Source="{Binding Image}"
+                                Aspect="AspectFill"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+                            
+                            <StackLayout 
+                                Grid.Column="1"
+                                VerticalOptions="Center">
+
                                 <Label Text="{Binding Name}"/>
                                 <Label Text="{Binding Location}"/>
                             </StackLayout>
@@ -659,16 +710,17 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
         <!-- Add this -->
-        <Button Text="Search"
-                Command="{Binding GetRecipesCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                Grid.Row="1"
-                Grid.Column="0"/>
+        <Button 
+            Grid.Row="1"
+            Grid.Column="0"
+            Text="Search" 
+            Command="{Binding GetRecipesCommand}"
+            IsEnabled="{Binding IsNotBusy}"/>
     </Grid>
 </ContentPage>
 ```
-
 
 6. Finally, In the `RecipesPage.xaml`, we can add a `ActivityIndicator` above all of our controls at the very bottom or `Grid` that will show an indication that something is happening when we press the Search button.
 
@@ -686,34 +738,53 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
 
-    <Grid RowSpacing="0" ColumnSpacing="5">
+   <Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-         <ListView ItemsSource="{Binding Recipes}"
-                  CachingStrategy="RecycleElement"
-                  HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
+
+        <ListView 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding Recipes}"
+            HasUnevenRows="True"
+            CachingStrategy="RecycleElement">
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Grid ColumnSpacing="10" Padding="10">
+                        <Grid 
+                            ColumnSpacing="10" 
+                            Padding="10">
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding Image}"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    WidthRequest="60"
-                                    HeightRequest="60"
-                                    Aspect="AspectFill"/>
-                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+
+                            <Image 
+                                Source="{Binding Image}"
+                                Aspect="AspectFill"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+                            
+                            <StackLayout 
+                                Grid.Column="1"
+                                VerticalOptions="Center">
+
                                 <Label Text="{Binding Name}"/>
                                 <Label Text="{Binding Location}"/>
                             </StackLayout>
@@ -723,24 +794,33 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
             </ListView.ItemTemplate>
         </ListView>
 
-        <Button Text="Search"
-                Command="{Binding GetRecipesCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                Grid.Row="1"
-                Grid.Column="0"/>
+        <Button 
+            Grid.Row="1"
+            Grid.Column="0"
+            Text="Search" 
+            Command="{Binding GetRecipesCommand}"
+            IsEnabled="{Binding IsNotBusy}"/>
+        
+        <Button 
+            Grid.Row="1"
+            Grid.Column="1"
+            Text="Find Closest" 
+            Command="{Binding GetClosestCommand}"
+            IsEnabled="{Binding IsNotBusy}"/>
 
-
-        <!-- Add this -->
-        <ActivityIndicator IsVisible="{Binding IsBusy}"
-                           IsRunning="{Binding IsBusy}"
-                           HorizontalOptions="FillAndExpand"
-                           VerticalOptions="CenterAndExpand"
-                           Grid.RowSpan="2"
-                           Grid.ColumnSpan="2"/>
+         <!-- Add this -->
+        <ActivityIndicator 
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            IsVisible="{Binding IsBusy}"
+            IsRunning="{Binding IsBusy}"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="CenterAndExpand"/>
     </Grid>
 </ContentPage>
 ```
-
 
 ### 11. Run the App
 
@@ -772,7 +852,7 @@ We can add more functionality to this page using the GPS of the device since eac
 1. In our `RecipesViewModel.cs`, let's create another method called `GetClosestAsync`:
 
 ```csharp
-async Task GetClosestAsync()
+private async Task GetClosestAsync()
 {
 
 }
@@ -788,7 +868,6 @@ async Task GetClosestAsync()
 
     try
     {
-        // Get cached location, else get real location.
         var location = await Geolocation.GetLastKnownLocationAsync();
         if (location == null)
         {
@@ -799,37 +878,37 @@ async Task GetClosestAsync()
             });
         }
 
-        // Find closest recipe to us
-        var first = Recipes.OrderBy(m => location.CalculateDistance(
-            new Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
+        var closestRecipe = Recipes
+            .OrderBy(m => location.CalculateDistance(new Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
             .FirstOrDefault();
 
-        await Application.Current.RecipesPage.DisplayAlert("", first.Name + " " +
-            first.Location, "OK");
-
+        if(closestRecipe == null)
+            await Application.Current.MainPage.DisplayAlert("No recipe found", "Something went wrong !", "OK");
+        else
+            await Application.Current.MainPage.DisplayAlert("Closest recipe", closestRecipe.Name + " at " + closestRecipe.Location, "OK");
     }
     catch (Exception ex)
     {
         Debug.WriteLine($"Unable to query location: {ex.Message}");
-        await Application.Current.RecipesPage.DisplayAlert("Error!", ex.Message, "OK");
+        await Application.Current.MainPage.DisplayAlert("Error!", ex.Message, "OK");
     }
 }
 ```
 
-2. We can now create a new `Command` that we can bind to:
+2. We can now add a new `Command` that we can bind to:
 
 ```csharp
-// ..
+//...
 public Command GetClosestCommand { get; }
-public RecipesViewModel()
+
+public RecipesViewModel() : base(title: "Recipes")
 {
-    // ..
+    //...
     GetClosestCommand = new Command(async () => await GetClosestAsync());
 }
 ```
 
 3. Back in our `RecipesPage.xaml` we can add another `Button` that will call this new method:
-
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -845,35 +924,53 @@ public RecipesViewModel()
         <viewmodel:RecipesViewModel/>
     </ContentPage.BindingContext>
 
+<Grid 
+        RowSpacing="0"
+        ColumnSpacing="5" 
+        CompressedLayout.IsHeadless="True">
 
-    <Grid RowSpacing="0" ColumnSpacing="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-         <ListView ItemsSource="{Binding Recipes}"
-                  CachingStrategy="RecycleElement"
-                  HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
+
+        <ListView 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding Recipes}"
+            HasUnevenRows="True"
+            CachingStrategy="RecycleElement">
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Grid ColumnSpacing="10" Padding="10">
+                        <Grid 
+                            ColumnSpacing="10" 
+                            Padding="10">
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding Image}"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    WidthRequest="60"
-                                    HeightRequest="60"
-                                    Aspect="AspectFill"/>
-                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+
+                            <Image 
+                                Source="{Binding Image}"
+                                Aspect="AspectFill"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+                            
+                            <StackLayout 
+                                Grid.Column="1"
+                                VerticalOptions="Center">
+
                                 <Label Text="{Binding Name}"/>
                                 <Label Text="{Binding Location}"/>
                             </StackLayout>
@@ -882,25 +979,31 @@ public RecipesViewModel()
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button Text="Search"
-                Command="{Binding GetRecipesCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                Grid.Row="1"
-                Grid.Column="0"/>
 
+        <Button 
+            Grid.Row="1"
+            Grid.Column="0"
+            Text="Search" 
+            Command="{Binding GetRecipesCommand}"
+            IsEnabled="{Binding IsNotBusy}"/>
+        
         <!-- Add this -->
-        <Button Text="Find Closest" 
-                Command="{Binding GetClosestCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                Grid.Row="1"
-                Grid.Column="1"/>
+        <Button 
+            Grid.Row="1"
+            Grid.Column="1"
+            Text="Find Closest" 
+            Command="{Binding GetClosestCommand}"
+            IsEnabled="{Binding IsNotBusy}"/>
 
-        <ActivityIndicator IsVisible="{Binding IsBusy}"
-                           IsRunning="{Binding IsBusy}"
-                           HorizontalOptions="FillAndExpand"
-                           VerticalOptions="CenterAndExpand"
-                           Grid.RowSpan="2"
-                           Grid.ColumnSpan="2"/>
+        <ActivityIndicator 
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            IsVisible="{Binding IsBusy}"
+            IsRunning="{Binding IsBusy}"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="CenterAndExpand"/>
     </Grid>
 </ContentPage>
 ```
@@ -914,25 +1017,27 @@ Xamarin.Forms gives developers a great base set of controls to use for applicati
 In our `RecipesPage.xaml` replace:
 
 ```xml
-<Image Source="{Binding Image}"
-        HorizontalOptions="Center"
-        VerticalOptions="Center"
+    <Image 
+        Source="{Binding Image}"
+        Aspect="AspectFill"
         WidthRequest="60"
         HeightRequest="60"
-        Aspect="AspectFill"/>
+        HorizontalOptions="Center"
+        VerticalOptions="Center"/>
 ```
 
 with our new `CircleImage`:
 
 ```xml
-<circle:CircleImage Source="{Binding Image}"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    BorderColor="{StaticResource PrimaryDark}"
-                    BorderThickness="3"
-                    WidthRequest="60"
-                    HeightRequest="60"
-                    Aspect="AspectFill"/>
+    <circle:CircleImage 
+        Source="{Binding Image}"
+        Aspect="AspectFill"
+        BorderColor="{StaticResource PrimaryDark}"
+        BorderThickness="3"
+        WidthRequest="60"
+        HeightRequest="60"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"/>
 ```
 
 Note: that the `PrimaryDark` color is defined in our App.xaml as a global resource.
@@ -948,19 +1053,25 @@ Now, let's add navigation to a second page that displays recipe details!
 Before:
 
 ```xml
-<ListView ItemsSource="{Binding Recipes}"
-            CachingStrategy="RecycleElement"
-            HasUnevenRows="True"
-            Grid.ColumnSpan="2">
+    <ListView 
+        Grid.Row="0"
+        Grid.Column="0"
+        Grid.ColumnSpan="2"
+        ItemsSource="{Binding Recipes}"
+        HasUnevenRows="True"
+        CachingStrategy="RecycleElement">
 ```
 
 After:
 ```xml
-<ListView ItemsSource="{Binding Recipes}"
-            CachingStrategy="RecycleElement"
-            ItemSelected="ListView_ItemSelected"
-            HasUnevenRows="True"
-            Grid.ColumnSpan="2">
+    <ListView 
+        Grid.Row="0"
+        Grid.Column="0"
+        Grid.ColumnSpan="2"
+        ItemsSource="{Binding Recipes}"
+        HasUnevenRows="True"
+        CachingStrategy="RecycleElement"
+        ItemSelected="ListView_ItemSelected">
 ```
 
 
@@ -968,15 +1079,15 @@ After:
     - This code checks to see if the selected item is non-null and then use the built in `Navigation` API to push a new page and deselect the item.
 
 ```csharp
-async void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+private async void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
 {
-    var recipe = e.SelectedItem as Recipe;
-    if (recipe == null)
-        return;
+    if (e.SelectedItem is Recipe selectedRecipe)
+    {
+        ListView listView = (ListView) sender;
+        listView.SelectedItem = null;
 
-    await Navigation.PushAsync(new RecipeDetailsPage(recipe));
-
-    ((ListView)sender).SelectedItem = null;
+        await Navigation.PushAsync(new DetailsPage(selectedRecipe));
+    }
 }
 ```
 
@@ -989,17 +1100,7 @@ Let's first create a bindable property for the `Recipe`:
 ```csharp
 public class RecipeDetailsViewModel : BaseViewModel
 {
-    public RecipeDetailsViewModel()
-    {
-    }
-
-    public RecipeDetailsViewModel(Recipe recipe)
-        : this()
-    {
-        Recipe = recipe;
-        Title = $"{Recipe.Name} Details";
-    }
-    Recipe recipe;
+    private Recipe recipe;
     public Recipe Recipe
     {
         get => recipe;
@@ -1012,6 +1113,16 @@ public class RecipeDetailsViewModel : BaseViewModel
             OnPropertyChanged();
         }
     }
+    
+    public RecipeDetailsViewModel() : base(title: "Details")
+    {
+
+    }
+
+    public RecipeDetailsViewModel(Recipe recipe) : base(title: $"{recipe.Name}")
+    {
+        Recipe = recipe;
+    }
 }
 ```
 
@@ -1020,16 +1131,22 @@ public class RecipeDetailsViewModel : BaseViewModel
 ```csharp
 public class RecipeDetailsViewModel : BaseViewModel
 {
+    //...
     public Command OpenMapCommand { get; }
     
-    public RecipeDetailsViewModel()
+    public RecipeDetailsViewModel() : base(title: "Details")
     {
         OpenMapCommand = new Command(async () => await OpenMapAsync()); 
     }
 
-    //..
+    public RecipeDetailsViewModel(Recipe recipe) : base(title: $"{recipe.Name}")
+    {
+        Recipe = recipe;
+        OpenMapCommand = new Command(async () => await OpenMapAsync());
+    }
+    //...
 
-    async Task OpenMapAsync()
+    private async Task OpenMapAsync()
     {
         try
         {
@@ -1038,7 +1155,7 @@ public class RecipeDetailsViewModel : BaseViewModel
         catch (Exception ex)
         {
             Debug.WriteLine($"Unable to launch maps: {ex.Message}");
-            await Application.Current.RecipesPage.DisplayAlert("Error, no Maps app!", ex.Message, "OK");
+            await Application.Current.MainPage.DisplayAlert("Error, no Maps app!", ex.Message, "OK");
         }
     }
 }
