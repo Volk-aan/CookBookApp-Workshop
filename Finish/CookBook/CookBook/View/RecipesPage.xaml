@@ -21,12 +21,13 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <ListView ItemsSource="{Binding Recipes}"
                   CachingStrategy="RecycleElement"
                   ItemSelected="ListView_ItemSelected"
                   HasUnevenRows="True"
-                  Grid.ColumnSpan="2">
+                  Grid.ColumnSpan="3">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
@@ -64,6 +65,11 @@
                 IsEnabled="{Binding IsNotBusy}"
                 Grid.Row="1"
                 Grid.Column="1"/>
+        <Button Text="Pic it !" 
+                Command="{Binding GetByPictureCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                Grid.Row="1"
+                Grid.Column="2"/>
 
 
         <ActivityIndicator IsVisible="{Binding IsBusy}"
