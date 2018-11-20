@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace CookBook.Model
 {
-    public partial class Recipe
+    public class Recipe
     {
         [JsonProperty("Name")]
         public string Name { get; set; }
@@ -27,16 +27,6 @@ namespace CookBook.Model
 
         [JsonProperty("Longitude")]
         public double Longitude { get; set; }
-    }
-
-    public partial class Recipe
-    {
-        public static Recipe[] FromJson(string json) => JsonConvert.DeserializeObject<Recipe[]>(json, Converter.Settings);
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this Recipe[] self) => JsonConvert.SerializeObject(self, Converter.Settings);
     }
 
     internal static class Converter

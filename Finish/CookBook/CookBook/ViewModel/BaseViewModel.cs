@@ -1,40 +1,44 @@
-﻿using CookBook.Services;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
-using Xamarin.Forms;
 
 namespace CookBook.ViewModel
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
-        public IDataService DataService { get; }
-        public BaseViewModel()
-        {
-            DataService = DependencyService.Get<IDataService>();
-        }
+        #region Service
 
-        string title;
+        private HttpClient _httpClient;
+        protected HttpClient Client => _httpClient ?? (_httpClient = new HttpClient());
+
+        #endregion
+       
+        #region Properties
+
+        private string _title;
         public string Title
         {
-            get => title;
+            get => _title;
             set
             {
-                if (title == value)
+                if (_title == value)
                     return;
-                title = value;
+                _title = value;
                 OnPropertyChanged();
             }
         }
 
-        bool isBusy;
+        private bool _isBusy;
         public bool IsBusy
         {
-            get => isBusy;
+            get => _isBusy;
             set
             {
-                if (isBusy == value)
+                if (_isBusy == value)
                     return;
-                isBusy = value;
+
+                _isBusy = value;
+
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsNotBusy));
             }
@@ -42,8 +46,25 @@ namespace CookBook.ViewModel
 
         public bool IsNotBusy => !IsBusy;
 
+        #endregion
+
+        #region Constructors
+
+        public BaseViewModel(string title)
+        {
+            Title = title;
+        }
+        
+        #endregion
+        
+        #region Property Changes
+    
         public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName]string propertyName = "") =>
-         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
     }
 }

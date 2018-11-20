@@ -1,8 +1,7 @@
-﻿using CookBook.Model;
-using CookBook.ViewModel;
-
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using CookBook.Model;
+using CookBook.ViewModel;
 
 namespace CookBook.View
 {
@@ -13,6 +12,7 @@ namespace CookBook.View
         {
             InitializeComponent();
         }
+
         public DetailsPage(Recipe recipe)
         {
             InitializeComponent();

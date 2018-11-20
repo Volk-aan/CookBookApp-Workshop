@@ -7,9 +7,11 @@
              ios:Page.UseSafeArea="True"
              x:Class="CookBook.View.DetailsPage"
              Title="{Binding Title}">
+
     <ContentPage.BindingContext>
         <viewmodel:RecipeDetailsViewModel/>
     </ContentPage.BindingContext>
+
     <ScrollView>
         <StackLayout>
             <Grid>
