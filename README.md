@@ -12,11 +12,11 @@ Follow our simple [setup guide](https://github.com/xamarin/dev-days-labs/raw/mas
 
 ### 1. Open Solution in Visual Studio
 
-1. Open **Start/CookBookApp.sln**
+1. Open **Start/CookBook.sln**
 
 This CookBookApp contains 4 projects
 
-* CookBook  - Shared .NET Standard project that will have all shared code (model, views, view models, and services)
+* CookBook  - Shared .NET Standard project that will have all shared code (models, views, view models)
 * CookBook.Android - Xamarin.Android application
 * CookBook.iOS - Xamarin.iOS application (requires a macOS build host)
 * CookBook.UWP - Windows 10 UWP application (requires Visual Studio /2017 on Windows 10)
@@ -130,35 +130,44 @@ public event PropertyChangedEventHandler PropertyChanged;
     - Note: We will call `OnPropertyChanged` whenever a property updates
 
 ```csharp
-private void OnPropertyChanged([CallerMemberName] string name = null)
+public void OnPropertyChanged([CallerMemberName] string propertyName = "")
 {
-
+    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
-```
-
-7. Add code to `OnPropertyChanged`:
-
-```csharp
-private void OnPropertyChanged([CallerMemberName] string name = null) =>
-    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 ```
 
 ### 5. Implementing Title, IsBusy, and IsNotBusy
 
 We will create a backing field and accessors for a few properties. These properties will allow us to set the title on our pages and also let our view know that our view model is busy so we don't perform duplicate operations (like allowing the user to refresh the data multiple times). They are in the `BaseViewModel` because they are common for every page.
 
-1. In `BaseViewModel.cs`, create the backing field:
+1. In `BaseViewModel.cs`, create the following properties:
 
 ```csharp
 public class BaseViewModel : INotifyPropertyChanged
 {
-    bool isBusy;
-    string title;
-    //...
+    private string _title;
+    public string Title
+    {
+        get => _title;
+        set
+        {
+            _title = value;
+        }
+    }
+
+    private bool _isBusy;
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set
+        {
+            _isBusy = value;
+        }
+    }
 }
 ```
 
-2. Create the properties:
+2. Add OnPropertyChanged to the properties:
 
 ```csharp
 public class BaseViewModel : INotifyPropertyChanged
@@ -171,7 +180,9 @@ public class BaseViewModel : INotifyPropertyChanged
         {
             if (isBusy == value)
                 return;
+                
             isBusy = value;
+            
             OnPropertyChanged();
         }
     }
@@ -183,7 +194,9 @@ public class BaseViewModel : INotifyPropertyChanged
         {
             if (title == value)
                 return;
+                
             title = value;
+            
             OnPropertyChanged();
         }
     }
@@ -206,9 +219,10 @@ public class BaseViewModel : INotifyPropertyChanged
         {
             if (isBusy == value)
                 return;
+                
             isBusy = value;
+            
             OnPropertyChanged();
-            // Also raise the IsNotBusy property changed
             OnPropertyChanged(nameof(IsNotBusy));
         }
     } 
