@@ -13,6 +13,7 @@ namespace CookBook.View
         {
             InitializeComponent();
         }
+
         public RecipeDetailsPage(Recipe recipe)
         {
             InitializeComponent();
