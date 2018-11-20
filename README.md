@@ -164,16 +164,30 @@ public class BaseViewModel : INotifyPropertyChanged
             _isBusy = value;
         }
     }
+    //...
 }
 ```
 
-2. Add OnPropertyChanged to the properties:
+2. Add a constructor with a title parameter :
 
 ```csharp
 public class BaseViewModel : INotifyPropertyChanged
 {
     //...
-     public bool IsBusy
+    public BaseViewModel(string title)
+    {
+        Title = title;
+    }
+    //...
+}
+```
+
+3. Add OnPropertyChanged to the properties:
+
+```csharp
+public class BaseViewModel : INotifyPropertyChanged
+{
+    public bool IsBusy
     {
         get => isBusy;
         set
@@ -232,111 +246,43 @@ public class BaseViewModel : INotifyPropertyChanged
 }
 ```
 
-### 6. Creating our Data Service
+### 6. Add a HttpClient in BaseViewModel
 
-Inside our our `Services` folder lives two files that represent an interface contract (`IDataService`) for getting the data and an implementation that we will fill in (`WebDataService`).
-
-1. Let's first create the interface in `Services/IDataService.cs`. It will be a simple method that returns a Task of a list of recipes. Place this code inside of: `public interface IDataService`
+To simplify the internet interactions, we will add these following lines inside our **BaseViewModel** :
 
 ```csharp
-Task<IEnumerable<Recipe>> GetRecipesAsync();
-```
-
-Next, inside of `Services/WebDataService.cs` will live the implementation to get these recipes. I have already brought in the namespaces required for the implementation.
-
-2. We can now implement that interface. First by adding `IDataService` to the class:
-
-Before:
-
-```csharp
-public class WebDataService 
+public class BaseViewModel : INotifyPropertyChanged
 {
+    //...
+    private HttpClient _httpClient;
+    protected HttpClient Client => _httpClient ?? (_httpClient = new HttpClient());
+    //...
 }
 ```
 
-After:
+`Client` property will be used by our view models to retrieve data from the internet.
 
-```csharp
-public class WebDataService : IDataService
-{
-}
-```
-
-3. Implement the `IDataService` Interface
-   - (Visual Studio for Mac) In the right-click menu, select Quick Fix -> Implement Interface
-   - (Visual Studio PC) In the right-click menu, select Quick Actions and Refactorings -> Implement Interface
-
-Before implementing `GetRecipesAsync` we will setup our HttpClient by setting up a shared instance inside of the class:
-
-```csharp
-HttpClient httpClient;
-HttpClient Client => httpClient ?? (httpClient = new HttpClient());
-```
-
-Now we can implement the method. We will be using async calls, so we must add the `async` attribute to the method:
-
-Before:
-
-```csharp
-public Task<IEnumerable<Recipe>> GetRecipesAsync()
-{
-}
-```
-
-After:
-
-```csharp
-public async Task<IEnumerable<Recipe>> GetRecipesAsync()
-{
-}
-```
-
-To get the data from our server and parse it is actually extremely easy by leveraging `HttpClient` and `Json.NET`:
-
-```csharp
-public async Task<IEnumerable<Recipe>> GetRecipesAsync()
-{
-    var json = await Client.GetStringAsync("https://montemagno.com/recipes.json");
-    var all = Recipe.FromJson(json);
-    return all;
-}
-```
-
-Note that in this file is a line of a code above the namespace `[assembly:Dependency(typeof(WebDataService))]`. This is the Xamarin.Forms dependency service which will automatically register this class and it's interface that we can retrieve a global instance of later.
-
-4. Let's end by ensuring we have reference at any time to this implementation by retrieving it in our `BaseViewModel` by adding the following code in the class:
-
-```csharp
-public IDataService DataService { get; }
-public BaseViewModel()
-{
-    DataService = DependencyService.Get<IDataService>();
-}
-```
-
-### 6. Create ObservableCollection of Recipes
+### 7. Create ObservableCollection of Recipes
 
 We will use an `ObservableCollection<Recipe>` that will be cleared and then loaded with **Recipe** objects. We use an `ObservableCollection` because it has built-in support to raise `CollectionChanged` events when we Add or Remove items from the collection. This means we don't call `OnPropertyChanged` when updating the collection.
 
-1. In `RecipesViewModel.cs` declare an auto-property which we will initialize to an empty collection. Also, we can set our Title to `Recipe Finder`.
+1. In `RecipesViewModel.cs` declare an auto-property which we will initialize to an empty collection. Also, we can set our view model Title to `Recipes` using base constructor.
 
 ```csharp
 public class RecipesViewModel : BaseViewModel
 {
-    //...
     public ObservableCollection<Recipe> Recipes { get; }
-    public RecipesViewModel()
+    
+    public RecipesViewModel() : base(title: "Recipes")
     {
-        Title = "Recipe Finder";
         Recipes = new ObservableCollection<Recipe>();
     }
-    //...
 }
 ```
 
-### 7. Create GetRecipesAsync Method
+### 8. Get Recipes from the internet
 
-We are ready to create a method named `GetRecipesAsync` which will retrieve the recipe data from the internet. We will first implement this with a simple HTTP request, and later update it to grab and sync the data from Azure!
+We are ready to retrieve the recipe data from the internet.
 
 1. In `RecipesViewModel.cs`, create a method named `GetRecipesAsync` with that returns `async Task`:
 
@@ -344,8 +290,9 @@ We are ready to create a method named `GetRecipesAsync` which will retrieve the 
 public class RecipesViewModel : BaseViewModel
 {
     //...
-    async Task GetRecipesAsync()
+    private async Task GetRecipesAsync()
     {
+    
     }
     //...
 }
@@ -354,7 +301,7 @@ public class RecipesViewModel : BaseViewModel
 2. In `GetRecipesAsync`, first ensure `IsBusy` is false. If it is true, `return`
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     if (IsBusy)
         return;
@@ -365,14 +312,16 @@ async Task GetRecipesAsync()
     - Notice, that we toggle *IsBusy* to true and then false when we start to call to the server and when we finish.
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     if (IsBusy)
         return;
 
+    IsBusy = true;
+    
     try
     {
-        IsBusy = true;
+        
 
     }
     catch (Exception ex)
@@ -387,10 +336,11 @@ async Task GetRecipesAsync()
 }
 ```
 
-4. In the `try` block of `GetRecipesAsync`, we can get the recipes from our Data Service.
+4. In the `try` block of `GetRecipesAsync`, we will get the recipes using the HttpClient (Client) in our BaseViewModel class.
+To get the data from our server and parse it is actually extremely easy by leveraging `HttpClient` and `Json.NET`.
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     ...
     try
@@ -403,7 +353,7 @@ async Task GetRecipesAsync()
 }
 ```
 
-6. Inside of the `using`, clear the `Recipes` property and then add the new recipe data:
+5. Inside of the `using`, clear the `Recipes` property and then add the new recipe data:
 
 ```csharp
 async Task GetRecipesAsync()
@@ -423,7 +373,7 @@ async Task GetRecipesAsync()
 }
 ```
 
-7. In `GetRecipesAsync`, add this code to the `catch` block to display a popup if the data retrieval fails:
+6. In `GetRecipesAsync`, add this code to the `catch` block to display a popup if the data retrieval fails:
 
 ```csharp
 async Task GetRecipesAsync()
@@ -438,7 +388,7 @@ async Task GetRecipesAsync()
 }
 ```
 
-8. Ensure the completed code looks like this:
+7. Ensure the completed code looks like this:
 
 ```csharp
 async Task GetRecipesAsync()
@@ -470,7 +420,7 @@ async Task GetRecipesAsync()
 
 Our main method for getting data is now complete!
 
-#### 8. Create GetRecipes Command
+#### 9. Create GetRecipes Command
 
 Instead of invoking this method directly, we will expose it with a `Command`. A `Command` has an interface that knows what method to invoke and has an optional way of describing if the Command is enabled.
 
@@ -502,7 +452,7 @@ public class RecipesViewModel : BaseViewModel
 }
 ```
 
-## 9. Build The Recipes User Interface
+## 10. Build The Recipes User Interface
 It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xaml`. Our end result is to build a page that looks like this:
 
 ![](Art/FinalUI.PNG)
@@ -804,7 +754,7 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
 ```
 
 
-### 10. Run the App
+### 11. Run the App
 
 1. In Visual Studio, set the iOS, Android, or UWP project as the startup project 
 
