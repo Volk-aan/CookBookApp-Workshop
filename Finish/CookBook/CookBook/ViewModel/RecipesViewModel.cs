@@ -177,8 +177,8 @@ namespace CookBook.ViewModel
             string SouthCentralUsEndpoint = "https://southcentralus.api.cognitive.microsoft.com";
 
             // Add your training & prediction key from the settings page of the portal
-            string trainingKey = "2879f3d6240a4805bffe13b64758e02c";
-            string predictionKey = "ddbeaf61ee2e4ef99432de15336630d1";
+            string trainingKey = "";
+            string predictionKey = "";
 
             // Create the Api, passing in the training key
             CustomVisionTrainingClient trainingApi = new CustomVisionTrainingClient()
@@ -188,7 +188,7 @@ namespace CookBook.ViewModel
             };
 
             // Create a new project
-            Guid projectId = new Guid("1bb9aeab-ce73-4025-947a-e04f216ea804");
+            Guid projectId = new Guid("");
             var project = trainingApi.GetProject(projectId);
 
             // Now there is a trained endpoint, it can be used to make a prediction
@@ -201,7 +201,6 @@ namespace CookBook.ViewModel
             };
 
             // Make a prediction against the new project
-            Console.WriteLine("Making a prediction:");
             var result = endpoint.PredictImage(project.Id, image);
             var tag = result.Predictions.FirstOrDefault();
 
@@ -212,7 +211,7 @@ namespace CookBook.ViewModel
         {
             if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
             {
-                await Application.Current.MainPage.DisplayAlert("Error!", "Aucun appareil photo détecté", "Votre appareil ne dispose pas ou ne trouve pas d'appareil photo.");
+                await Application.Current.MainPage.DisplayAlert("Error!", "No camera detected", "Your device does not have or can not find a camera.");
             }
 
             var file = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
