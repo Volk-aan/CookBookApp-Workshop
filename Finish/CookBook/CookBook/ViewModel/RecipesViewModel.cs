@@ -32,11 +32,12 @@ namespace CookBook.ViewModel
 
         public Command GetRecipesCommand { get; }
         public Command GetClosestCommand { get; }
+        public Command GetByPictureCommand { get; }
 
         #endregion
-       
+
         #region Constructors
-        
+
         public RecipesViewModel() : base(title: "Recipes")
         {
             Recipes = new ObservableCollection<Recipe>();
@@ -95,7 +96,7 @@ namespace CookBook.ViewModel
                 }
 
                 var closestRecipe = Recipes
-                    .OrderBy(m => location.CalculateDistance(new Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
+                    .OrderBy(m => location.CalculateDistance(new Xamarin.Essentials.Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
                     .FirstOrDefault();
 
                 if(closestRecipe == null)
@@ -112,6 +113,11 @@ namespace CookBook.ViewModel
 
         private async Task GetRecipeByImage()
         {
+            if (IsBusy)
+                return;
+
+            IsBusy = true;
+
             try
             {
                 var image = await TakePhoto();
@@ -125,6 +131,10 @@ namespace CookBook.ViewModel
             {
                 Debug.WriteLine($"Unable to get tags: {ex.Message}");
                 await Application.Current.MainPage.DisplayAlert("Error!", ex.Message, "OK");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
@@ -180,5 +190,7 @@ namespace CookBook.ViewModel
 
             return tag;
         }
+
+        #endregion
     }
 }
