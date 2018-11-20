@@ -69,16 +69,6 @@ public partial class Recipe
     public double Longitude { get; set; }
 }
 
-public partial class Recipe
-{
-    public static Recipe[] FromJson(string json) => JsonConvert.DeserializeObject<Recipe[]>(json, CookBook.Model.Converter.Settings);
-}
-
-public static class Serialize
-{
-    public static string ToJson(this Recipe[] self) => JsonConvert.SerializeObject(self, CookBook.Model.Converter.Settings);
-}
-
 internal static class Converter
 {
     public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
@@ -282,7 +272,7 @@ public class RecipesViewModel : BaseViewModel
 
 ### 8. Get Recipes from the internet
 
-We are ready to retrieve the recipe data from the internet.
+We are ready to retrieve the recipe data from the internet. We will not use DependencyService here to keep it simple.
 
 1. In `RecipesViewModel.cs`, create a method named `GetRecipesAsync` with that returns `async Task`:
 
@@ -332,7 +322,6 @@ private async Task GetRecipesAsync()
     {
        IsBusy = false;
     }
-
 }
 ```
 
@@ -345,25 +334,23 @@ private async Task GetRecipesAsync()
     ...
     try
     {
-        IsBusy = true;
-
-        var recipes = await DataService.GetRecipesAsync();
+        string jsonRecipes = await Client.GetStringAsync("http://www.croustipeze.com/ressources/recipesdata.json");
+        Recipe[] recipes = JsonConvert.DeserializeObject<Recipe[]>(jsonRecipes, Converter.Settings);
     }
     ... 
 }
 ```
 
-5. Inside of the `using`, clear the `Recipes` property and then add the new recipe data:
+5. Inside of the `try`, clear the `Recipes` property and then add the new recipe data:
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     //...
     try
     {
-        IsBusy = true;
-
-        var recipes = await DataService.GetRecipesAsync();
+        string jsonRecipes = await Client.GetStringAsync("http://www.croustipeze.com/ressources/recipesdata.json");
+        Recipe[] recipes = JsonConvert.DeserializeObject<Recipe[]>(jsonRecipes, Converter.Settings);
 
         Recipes.Clear();
         foreach (var recipe in recipes)
@@ -376,7 +363,7 @@ async Task GetRecipesAsync()
 6. In `GetRecipesAsync`, add this code to the `catch` block to display a popup if the data retrieval fails:
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     //...
     catch(Exception ex)
@@ -391,16 +378,17 @@ async Task GetRecipesAsync()
 7. Ensure the completed code looks like this:
 
 ```csharp
-async Task GetRecipesAsync()
+private async Task GetRecipesAsync()
 {
     if (IsBusy)
         return;
 
+    IsBusy = true;
+
     try
     {
-        IsBusy = true;
-
-        var recipes = await DataService.GetRecipesAsync();
+        string jsonRecipes = await Client.GetStringAsync("http://www.croustipeze.com/ressources/recipesdata.json");
+        Recipe[] recipes = JsonConvert.DeserializeObject<Recipe[]>(jsonRecipes, Converter.Settings);
 
         Recipes.Clear();
         foreach (var recipe in recipes)
@@ -409,7 +397,7 @@ async Task GetRecipesAsync()
     catch (Exception ex)
     {
         Debug.WriteLine($"Unable to get recipes: {ex.Message}");
-        await Application.Current.RecipesPage.DisplayAlert("Error!", ex.Message, "OK");
+        await Application.Current.MainPage.DisplayAlert("Error!", ex.Message, "OK");
     }
     finally
     {
