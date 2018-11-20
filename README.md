@@ -177,29 +177,31 @@ public class BaseViewModel : INotifyPropertyChanged
 ```csharp
 public class BaseViewModel : INotifyPropertyChanged
 {
-    public bool IsBusy
+    private string _title;
+    public string Title
     {
-        get => isBusy;
+        get => _title;
         set
         {
-            if (isBusy == value)
+            if (_title == value)
                 return;
                 
-            isBusy = value;
+            _title = value;
             
             OnPropertyChanged();
         }
     }
-
-    public string Title
+    
+    private bool _isBusy;
+    public bool IsBusy
     {
-        get => title;
+        get => _isBusy;
         set
         {
-            if (title == value)
+            if (_isBusy == value)
                 return;
                 
-            title = value;
+            _isBusy = value;
             
             OnPropertyChanged();
         }
@@ -216,15 +218,16 @@ We can also create the inverse of `IsBusy` by creating another property called `
 public class BaseViewModel : INotifyPropertyChanged
 {
     //...
+    private bool _isBusy;
     public bool IsBusy
     {
-        get => isBusy;
+        get => _isBusy;
         set
         {
-            if (isBusy == value)
+            if (_isBusy == value)
                 return;
                 
-            isBusy = value;
+            _isBusy = value;
             
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsNotBusy));
