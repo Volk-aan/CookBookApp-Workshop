@@ -78,6 +78,25 @@ namespace CookBook.ViewModel
             }
         }
 
+        private async Task GetRecipesByCategoryAsync(string category)
+        {
+            try
+            {
+                string jsonRecipes = await Client.GetStringAsync("http://www.croustipeze.com/ressources/recipesdata.json");
+                Recipe[] recipes = JsonConvert.DeserializeObject<Recipe[]>(jsonRecipes, Converter.Settings);
+
+                var results = recipes.Where(x => x.Category.ToLower() == category.ToLower()).ToList(); ;
+
+                Recipes.Clear();
+                foreach (var recipe in results)
+                    Recipes.Add(recipe);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Unable to get recipes: {ex.Message}");
+            }
+        }
+
         private async Task GetClosestAsync()
         {
             if (IsBusy || Recipes == null || !Recipes.Any())
@@ -123,8 +142,9 @@ namespace CookBook.ViewModel
                 var image = await TakePhoto();
                 if(image != null)
                 {
-                    var tag = await GetTagByPictureAsync(image);
+                    var tag = await ExtractInfoFromPicture(image);
                     await Application.Current.MainPage.DisplayAlert("Ca a l'air bon !", $"On affiche des recette de {tag.TagName} ? ({tag.Probability:P1} sûr)", "OK");
+                    await GetRecipesByCategoryAsync(tag.TagName);
                 }
             }
             catch (Exception ex)
@@ -138,24 +158,7 @@ namespace CookBook.ViewModel
             }
         }
 
-        private async Task<Stream> TakePhoto()
-        {
-            if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
-            {
-                await Application.Current.MainPage.DisplayAlert("Error!", "Aucun appareil photo détecté", "Votre appareil ne dispose pas ou ne trouve pas d'appareil photo.");
-            }
-
-            var file = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
-            {
-                CompressionQuality = 92,
-            });
-
-            Stream fileStream = file.GetStream();
-
-            return fileStream;
-        }
-
-        async Task<PredictionModel> GetTagByPictureAsync(Stream image)
+        async Task<PredictionModel> ExtractInfoFromPicture(Stream image)
         {
             string SouthCentralUsEndpoint = "https://southcentralus.api.cognitive.microsoft.com";
 
@@ -189,6 +192,23 @@ namespace CookBook.ViewModel
             var tag = result.Predictions.FirstOrDefault();
 
             return tag;
+        }
+
+        private async Task<Stream> TakePhoto()
+        {
+            if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error!", "Aucun appareil photo détecté", "Votre appareil ne dispose pas ou ne trouve pas d'appareil photo.");
+            }
+
+            var file = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions
+            {
+                CompressionQuality = 92,
+            });
+
+            Stream fileStream = file.GetStream();
+
+            return fileStream;
         }
 
         #endregion
