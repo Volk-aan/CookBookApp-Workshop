@@ -19,8 +19,8 @@ namespace CookBook.Model
         [JsonProperty("Image")]
         public Uri Image { get; set; }
 
-        [JsonProperty("Population")]
-        public long Population { get; set; }
+        [JsonProperty("Category")]
+        public string Category { get; set; }
 
         [JsonProperty("Latitude")]
         public double Latitude { get; set; }

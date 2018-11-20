@@ -62,7 +62,7 @@
                     Grid.Row="1" 
                     Grid.Column="2"
                     FontSize="Micro" 
-                    Text="{Binding Recipe.Population}" 
+                    Text="{Binding Recipe.Category}" 
                     HorizontalOptions="Center"
                     Margin="10"/>
             </Grid>
