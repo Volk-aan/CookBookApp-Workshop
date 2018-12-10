@@ -37,7 +37,7 @@ All projects have the required NuGet packages already installed, so there will b
 
 We will download details about the recipe and will need a class to represent it.
 
-We can easily convert our json file located at [croustipeze.com/ressources/recipesdata.json]("http://www.croustipeze.com/ressources/recipesdata.json") by using [quicktype.io](https://app.quicktype.io/) and pasting the raw json into quicktype to generate our C# classes. Ensure that you set the Name to `Recipe` and the generated namespace to `CookBook.Model` and select C#. Here is a direct URL to the code: [https://app.quicktype.io?share=W43y1rUvk1FBQa5RsBC0](https://app.quicktype.io?share=W43y1rUvk1FBQa5RsBC0)
+We can easily convert our json file located at [croustipeze.com/ressources/recipesdata.json](http://www.croustipeze.com/ressources/recipesdata.json) by using [quicktype.io](https://app.quicktype.io/) and pasting the raw json into quicktype to generate our C# classes. Ensure that you set the Name to `Recipe` and the generated namespace to `CookBook.Model` and select C#. Here is a direct URL to the code: [https://app.quicktype.io/?share=xRKHIICQxgCzZpplPWmh](https://app.quicktype.io/?share=xRKHIICQxgCzZpplPWmh)
 
 ![](Art/QuickType.PNG)
 
@@ -372,7 +372,7 @@ private async Task GetRecipesAsync()
     catch(Exception ex)
     {
         Debug.WriteLine($"Unable to get recipes: {ex.Message}");
-        await Application.Current.RecipesPage.DisplayAlert("Error!", ex.Message, "OK");
+        await Application.Current.MainPage.DisplayAlert("Error!", ex.Message, "OK");
     }
     //...
 }
@@ -803,14 +803,7 @@ It is now time to build the Xamarin.Forms user interface in `View/RecipesPage.xa
             Text="Search" 
             Command="{Binding GetRecipesCommand}"
             IsEnabled="{Binding IsNotBusy}"/>
-        
-        <Button 
-            Grid.Row="1"
-            Grid.Column="1"
-            Text="Find Closest" 
-            Command="{Binding GetClosestCommand}"
-            IsEnabled="{Binding IsNotBusy}"/>
-
+       
          <!-- Add this -->
         <ActivityIndicator 
             Grid.Row="0"
@@ -1011,6 +1004,8 @@ public RecipesViewModel() : base(title: "Recipes")
 </ContentPage>
 ```
 
+3. Handle the app permissions (depends on the version of Android you are using)
+
 Re-run the app to see geolocation in action!
 
 ### 13. Fancy Circle Recipes!
@@ -1089,7 +1084,7 @@ private async void ListView_ItemSelected(object sender, SelectedItemChangedEvent
         ListView listView = (ListView) sender;
         listView.SelectedItem = null;
 
-        await Navigation.PushAsync(new DetailsPage(selectedRecipe));
+        await Navigation.PushAsync(new RecipeDetailsPage(selectedRecipe));
     }
 }
 ```
@@ -1180,7 +1175,7 @@ At the core is a `ScrollView`, `StackLayout`, and `Grid` to layout all of the co
              xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
              xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
              ios:Page.UseSafeArea="True"
-             x:Class="CookBook.View.DetailsPage"
+             x:Class="CookBook.View.RecipeDetailsPage"
              Title="{Binding Title}">
 
     <ContentPage.BindingContext>
@@ -1207,7 +1202,7 @@ We can now fill in our `Grid` :
              xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
              xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
              ios:Page.UseSafeArea="True"
-             x:Class="CookBook.View.DetailsPage"
+             x:Class="CookBook.View.RecipeDetailsPage"
              Title="{Binding Title}">
 
     <ContentPage.BindingContext>
@@ -1283,7 +1278,7 @@ Finally, under the `Grid`, but inside of the `StackLayout` we will add details a
              xmlns:viewmodel="clr-namespace:CookBook.ViewModel"
              xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
              ios:Page.UseSafeArea="True"
-             x:Class="CookBook.View.DetailsPage"
+             x:Class="CookBook.View.RecipeDetailsPage"
              Title="{Binding Title}">
 
     <ContentPage.BindingContext>
