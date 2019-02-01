@@ -7,7 +7,9 @@ using System.Linq;
 using CookBook.Model;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using CookBook.Helper;
 using Newtonsoft.Json;
+using Plugin.Permissions.Abstractions;
 
 namespace CookBook.ViewModel
 {
@@ -74,24 +76,27 @@ namespace CookBook.ViewModel
 
             try
             {
-                var location = await Geolocation.GetLastKnownLocationAsync();
-                if (location == null)
+                if (await PermissionsManager.RequestPermissions(new[] {Permission.Location}))
                 {
-                    location = await Geolocation.GetLocationAsync(new GeolocationRequest
+                    var location = await Geolocation.GetLastKnownLocationAsync();
+                    if (location == null)
                     {
-                        DesiredAccuracy = GeolocationAccuracy.Medium,
-                        Timeout = TimeSpan.FromSeconds(30)
-                    });
+                        location = await Geolocation.GetLocationAsync(new GeolocationRequest
+                        {
+                            DesiredAccuracy = GeolocationAccuracy.Medium,
+                            Timeout = TimeSpan.FromSeconds(30)
+                        });
+                    }
+
+                    var closestRecipe = Recipes
+                        .OrderBy(m => location.CalculateDistance(new Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
+                        .FirstOrDefault();
+
+                    if(closestRecipe == null)
+                        await Application.Current.MainPage.DisplayAlert("No recipe found", "Something went wrong !", "OK");
+                    else
+                        await Application.Current.MainPage.DisplayAlert("Closest recipe", closestRecipe.Name + " at " + closestRecipe.Location, "OK");
                 }
-
-                var closestRecipe = Recipes
-                    .OrderBy(m => location.CalculateDistance(new Location(m.Latitude, m.Longitude), DistanceUnits.Miles))
-                    .FirstOrDefault();
-
-                if(closestRecipe == null)
-                    await Application.Current.MainPage.DisplayAlert("No recipe found", "Something went wrong !", "OK");
-                else
-                    await Application.Current.MainPage.DisplayAlert("Closest recipe", closestRecipe.Name + " at " + closestRecipe.Location, "OK");
             }
             catch (Exception ex)
             {
