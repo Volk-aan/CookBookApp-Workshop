@@ -36,9 +36,9 @@
     <string>Assets.xcassets/AppIcon.appiconset</string>
     <key>NSCalendarsUsageDescription</key>
     <string>Needs Calendar Permission</string>
-  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-  <string>Needs Location Permission</string>
-  <key>NSLocationWhenInUseUsageDescription</key>
-  <string>Needs Location Permission</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Needs Location Permission</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Needs Location Permission</string>
 </dict>
 </plist>
